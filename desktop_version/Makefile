@@ -1,7 +1,8 @@
-HEADERS=$(cd src; ls *.h)
+HEADERS=\
+	$(cd src; ls *.h) \
+	$(RUST_HEADER)
 
 C_OBJECT_FILES=\
-	lodepng/lodepng.o \
 	physfs/physfs.o \
 	physfs/physfs_archiver_dir.o \
 	physfs/physfs_archiver_unpacked.o \
@@ -49,7 +50,7 @@ CXX_OBJECT_FILES=\
 	src/preloader.o \
 	src/titlerender.o
 
-COMMON_FLAGS=-Os -I /usr/local/Cellar/sdl2_mixer/2.0.4/include/SDL2 -I /usr/local/Cellar/sdl2/2.0.10/include/SDL2 -I ./physfs -I ./tinyxml -D PHYSFS_SUPPORTS_DEFAULT=0 -D PHYSFS_SUPPORTS_ZIP=1 -D PHYSFS_PLATFORM_POSIX=1 -D PHYSFS_PLATFORM_UNIX=1 -D PHYSFS_NO_CDROM_SUPPORT=1
+COMMON_FLAGS=-Os -I vvvvvv_pieces -I /usr/local/Cellar/sdl2_mixer/2.0.4/include/SDL2 -I /usr/local/Cellar/sdl2/2.0.10/include/SDL2 -I ./physfs -I ./tinyxml -D PHYSFS_SUPPORTS_DEFAULT=0 -D PHYSFS_SUPPORTS_ZIP=1 -D PHYSFS_PLATFORM_POSIX=1 -D PHYSFS_PLATFORM_UNIX=1 -D PHYSFS_NO_CDROM_SUPPORT=1
 CXXFLAGS=$(COMMON_FLAGS)
 CFLAGS=$(COMMON_FLAGS)
 
@@ -61,13 +62,26 @@ clean:
 	rm -f $(C_OBJECT_FILES) $(CXX_OBJECT_FILES)
 	rm -f vvvvvv
 
+RUST_HEADER=vvvvvv_pieces/vvvvvv_pieces.h
+
+RUST_LIB=vvvvvv_pieces/target/debug/libvvvvvv_pieces.a
+
+all: vvvvvv
+
 %.o: %.c
 	clang $(CFLAGS) -o $@ -c $<
 
 %.o: %.cpp $(HEADERS)
 	clang++ $(CFLAGS) -o $@ -c $<
 
-vvvvvv: $(C_OBJECT_FILES) $(CXX_OBJECT_FILES)
+$(RUST_HEADER): $(RUST_LIB)
+
+$(RUST_LIB): .FORCE
+	cd vvvvvv_pieces && cargo build
+
+vvvvvv: $(C_OBJECT_FILES) $(CXX_OBJECT_FILES) $(RUST_LIB)
 	clang++ $(LDFLAGS) -o vvvvvv $^
 
-.PHONY: all clean
+.FORCE:
+
+.PHONY: .FORCE all clean

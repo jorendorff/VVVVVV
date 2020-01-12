@@ -1,26 +1,9 @@
 #include "GraphicsResources.h"
 #include "FileSystemUtils.h"
+#include "vvvvvv_pieces.h"
+
 #include <stdio.h>
 #include <stdlib.h>
-
-// Used to load PNG data
-extern "C"
-{
-	extern unsigned lodepng_decode24(
-		unsigned char** out,
-		unsigned* w,
-		unsigned* h,
-		const unsigned char* in,
-		size_t insize
-	);
-	extern unsigned lodepng_decode32(
-		unsigned char** out,
-		unsigned* w,
-		unsigned* h,
-		const unsigned char* in,
-		size_t insize
-	);
-}
 
 SDL_Surface* LoadImage(const char *filename, bool noBlend = true, bool noAlpha = false)
 {
@@ -37,11 +20,11 @@ SDL_Surface* LoadImage(const char *filename, bool noBlend = true, bool noAlpha =
 	FILESYSTEM_loadFileToMemory(filename, &fileIn, &length);
 	if (noAlpha)
 	{
-		lodepng_decode24(&data, &width, &height, fileIn, length);
+		vvvvvv_lodepng_decode24(&data, &width, &height, fileIn, length);
 	}
 	else
 	{
-		lodepng_decode32(&data, &width, &height, fileIn, length);
+		vvvvvv_lodepng_decode32(&data, &width, &height, fileIn, length);
 	}
 	FILESYSTEM_freeMemory(&fileIn);
 
@@ -65,7 +48,7 @@ SDL_Surface* LoadImage(const char *filename, bool noBlend = true, bool noAlpha =
 			0
 		);
 		SDL_FreeSurface( loadedImage );
-		free(data);
+		vvvvvv_lodepng_free(data);
 		if (noBlend)
 		{
 			SDL_SetSurfaceBlendMode(optimizedImage, SDL_BLENDMODE_BLEND);

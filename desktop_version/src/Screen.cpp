@@ -2,20 +2,9 @@
 
 #include "FileSystemUtils.h"
 #include "GraphicsUtil.h"
+#include "vvvvvv_pieces.h"
 
 #include <stdlib.h>
-
-// Used to create the window icon
-extern "C"
-{
-	extern unsigned lodepng_decode24(
-		unsigned char** out,
-		unsigned* w,
-		unsigned* h,
-		const unsigned char* in,
-		size_t insize
-	);
-}
 
 Screen::Screen()
 {
@@ -48,7 +37,7 @@ Screen::Screen()
 	unsigned char *data;
 	unsigned int width, height;
 	FILESYSTEM_loadFileToMemory("VVVVVV.png", &fileIn, &length);
-	lodepng_decode24(&data, &width, &height, fileIn, length);
+	vvvvvv_lodepng_decode24(&data, &width, &height, fileIn, length);
 	FILESYSTEM_freeMemory(&fileIn);
 	SDL_Surface *icon = SDL_CreateRGBSurfaceFrom(
 		data,
