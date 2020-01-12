@@ -49,11 +49,17 @@ CXX_OBJECT_FILES=\
 	src/preloader.o \
 	src/titlerender.o
 
-COMMON_FLAGS=-I /usr/local/Cellar/sdl2_mixer/2.0.4/include/SDL2 -I /usr/local/Cellar/sdl2/2.0.10/include/SDL2 -I ../physfs -I ../tinyxml -D PHYSFS_SUPPORTS_DEFAULT=0 -D PHYSFS_SUPPORTS_ZIP=1 -D PHYSFS_PLATFORM_POSIX=1 -D PHYSFS_PLATFORM_UNIX=1 -D PHYSFS_NO_CDROM_SUPPORT=1
+COMMON_FLAGS=-Os -I /usr/local/Cellar/sdl2_mixer/2.0.4/include/SDL2 -I /usr/local/Cellar/sdl2/2.0.10/include/SDL2 -I ./physfs -I ./tinyxml -D PHYSFS_SUPPORTS_DEFAULT=0 -D PHYSFS_SUPPORTS_ZIP=1 -D PHYSFS_PLATFORM_POSIX=1 -D PHYSFS_PLATFORM_UNIX=1 -D PHYSFS_NO_CDROM_SUPPORT=1
 CXXFLAGS=$(COMMON_FLAGS)
 CFLAGS=$(COMMON_FLAGS)
 
-LDFLAGS=-lc -lSDL2 -lSDL2_mixer
+LDFLAGS=-lc -lSDL2 -lSDL2_mixer -Xlinker -dead_strip
+
+all: vvvvvv
+
+clean:
+	rm -f $(C_OBJECT_FILES) $(CXX_OBJECT_FILES)
+	rm -f vvvvvv
 
 %.o: %.c
 	clang $(CFLAGS) -o $@ -c $<
@@ -63,3 +69,5 @@ LDFLAGS=-lc -lSDL2 -lSDL2_mixer
 
 vvvvvv: $(C_OBJECT_FILES) $(CXX_OBJECT_FILES)
 	clang++ $(LDFLAGS) -o vvvvvv $^
+
+.PHONY: all clean
