@@ -4,9 +4,13 @@ flibitBuild/
 CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
-Makefile
 vvvvvv.*
 *.a
+lodepng/*.o
+physfs/*.o
+src/*.o
+tinyxml/*.o
+vvvvvv
 
 # Game data
 data.zip

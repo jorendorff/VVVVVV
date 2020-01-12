@@ -1,0 +1,65 @@
+HEADERS=$(cd src; ls *.h)
+
+C_OBJECT_FILES=\
+	lodepng/lodepng.o \
+	physfs/physfs.o \
+	physfs/physfs_archiver_dir.o \
+	physfs/physfs_archiver_unpacked.o \
+	physfs/physfs_archiver_zip.o \
+	physfs/physfs_byteorder.o \
+	physfs/physfs_platform_posix.o \
+	physfs/physfs_platform_unix.o \
+	physfs/physfs_unicode.o
+
+CXX_OBJECT_FILES=\
+	tinyxml/tinystr.o \
+	tinyxml/tinyxml.o \
+	tinyxml/tinyxmlerror.o \
+	tinyxml/tinyxmlparser.o \
+	src/BinaryBlob.o \
+	src/BlockV.o \
+	src/Ent.o \
+	src/Entity.o \
+	src/FileSystemUtils.o \
+	src/Finalclass.o \
+	src/Game.o \
+	src/Graphics.o \
+	src/GraphicsResources.o \
+	src/GraphicsUtil.o \
+	src/Input.o \
+	src/KeyPoll.o \
+	src/Labclass.o \
+	src/Logic.o \
+	src/Map.o \
+	src/Music.o \
+	src/Otherlevel.o \
+	src/Screen.o \
+	src/Script.o \
+	src/Scripts.o \
+	src/SoundSystem.o \
+	src/Spacestation2.o \
+	src/SteamNetwork.o \
+	src/TerminalScripts.o \
+	src/Textbox.o \
+	src/Tower.o \
+	src/UtilityClass.o \
+	src/WarpClass.o \
+	src/editor.o \
+	src/main.o \
+	src/preloader.o \
+	src/titlerender.o
+
+COMMON_FLAGS=-I /usr/local/Cellar/sdl2_mixer/2.0.4/include/SDL2 -I /usr/local/Cellar/sdl2/2.0.10/include/SDL2 -I ../physfs -I ../tinyxml -D PHYSFS_SUPPORTS_DEFAULT=0 -D PHYSFS_SUPPORTS_ZIP=1 -D PHYSFS_PLATFORM_POSIX=1 -D PHYSFS_PLATFORM_UNIX=1 -D PHYSFS_NO_CDROM_SUPPORT=1
+CXXFLAGS=$(COMMON_FLAGS)
+CFLAGS=$(COMMON_FLAGS)
+
+LDFLAGS=-lc -lSDL2 -lSDL2_mixer
+
+%.o: %.c
+	clang $(CFLAGS) -o $@ -c $<
+
+%.o: %.cpp $(HEADERS)
+	clang++ $(CFLAGS) -o $@ -c $<
+
+vvvvvv: $(C_OBJECT_FILES) $(CXX_OBJECT_FILES)
+	clang++ $(LDFLAGS) -o vvvvvv $^
