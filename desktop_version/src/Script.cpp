@@ -11,15 +11,10 @@ scriptclass::scriptclass()
     	//Start SDL
 
 	//Init
-	for (int i = 0; i < 500; i++)
-	{
-		commands.push_back(std::string());
-	}
-	for (int i = 0; i < 40; i++)
-	{
-		words.push_back(std::string());
-		txt.push_back(std::string());
-	}
+	commands.resize(500);
+	words.resize(40);
+	txt.resize(40);
+
 	position = 0;
 	scriptlength = 0;
 	scriptdelay = 0;

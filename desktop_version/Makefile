@@ -3,20 +3,20 @@ HEADERS=\
 	$(RUST_HEADER)
 
 C_OBJECT_FILES=\
-	physfs/physfs.o \
-	physfs/physfs_archiver_dir.o \
-	physfs/physfs_archiver_unpacked.o \
-	physfs/physfs_archiver_zip.o \
-	physfs/physfs_byteorder.o \
-	physfs/physfs_platform_posix.o \
-	physfs/physfs_platform_unix.o \
-	physfs/physfs_unicode.o
+	../third_party/physfs/physfs.o \
+	../third_party/physfs/physfs_archiver_dir.o \
+	../third_party/physfs/physfs_archiver_unpacked.o \
+	../third_party/physfs/physfs_archiver_zip.o \
+	../third_party/physfs/physfs_byteorder.o \
+	../third_party/physfs/physfs_platform_posix.o \
+	../third_party/physfs/physfs_platform_unix.o \
+	../third_party/physfs/physfs_unicode.o
 
 CXX_OBJECT_FILES=\
-	tinyxml/tinystr.o \
-	tinyxml/tinyxml.o \
-	tinyxml/tinyxmlerror.o \
-	tinyxml/tinyxmlparser.o \
+	../third_party/tinyxml/tinystr.o \
+	../third_party/tinyxml/tinyxml.o \
+	../third_party/tinyxml/tinyxmlerror.o \
+	../third_party/tinyxml/tinyxmlparser.o \
 	src/BinaryBlob.o \
 	src/BlockV.o \
 	src/Ent.o \
@@ -50,7 +50,7 @@ CXX_OBJECT_FILES=\
 	src/preloader.o \
 	src/titlerender.o
 
-COMMON_FLAGS=-Os -I vvvvvv_pieces -I /usr/local/Cellar/sdl2_mixer/2.0.4/include/SDL2 -I /usr/local/Cellar/sdl2/2.0.10/include/SDL2 -I ./physfs -I ./tinyxml -D PHYSFS_SUPPORTS_DEFAULT=0 -D PHYSFS_SUPPORTS_ZIP=1 -D PHYSFS_PLATFORM_POSIX=1 -D PHYSFS_PLATFORM_UNIX=1 -D PHYSFS_NO_CDROM_SUPPORT=1
+COMMON_FLAGS=-Os -I vvvvvv_pieces -I /usr/local/Cellar/sdl2_mixer/2.0.4/include/SDL2 -I /usr/local/Cellar/sdl2/2.0.10/include/SDL2 -I ../third_party/physfs -I ../third_party/tinyxml -D PHYSFS_SUPPORTS_DEFAULT=0 -D PHYSFS_SUPPORTS_ZIP=1 -D PHYSFS_PLATFORM_POSIX=1 -D PHYSFS_PLATFORM_UNIX=1 -D PHYSFS_NO_CDROM_SUPPORT=1
 CXXFLAGS=$(COMMON_FLAGS)
 CFLAGS=$(COMMON_FLAGS)
 
