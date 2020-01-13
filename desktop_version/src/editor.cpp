@@ -1932,55 +1932,20 @@ void editorclass::save(std::string& _path)
     }
 
     //getUser
-    VVVVVV_XML_Element* meta = vvvvvv_xml_new_element( "Creator" );
-    vvvvvv_xml_append_text( meta, EditorData::GetInstance().creator.c_str() );
-    vvvvvv_xml_append( msg, meta );
-
-    meta = vvvvvv_xml_new_element( "Title" );
-    vvvvvv_xml_append_text( meta, EditorData::GetInstance().title.c_str() );
-    vvvvvv_xml_append( msg, meta );
-
-    meta = vvvvvv_xml_new_element( "Created" );
-    vvvvvv_xml_append_text( meta, UtilityClass::String(version).c_str() );
-    vvvvvv_xml_append( msg, meta );
-
-    meta = vvvvvv_xml_new_element( "Modified" );
-    vvvvvv_xml_append_text( meta, EditorData::GetInstance().modifier.c_str()  );
-    vvvvvv_xml_append( msg, meta );
-
-    meta = vvvvvv_xml_new_element( "Modifiers" );
-    vvvvvv_xml_append_text( meta, UtilityClass::String(version).c_str() );
-    vvvvvv_xml_append( msg, meta );
-
-    meta = vvvvvv_xml_new_element( "Desc1" );
-    vvvvvv_xml_append_text( meta, Desc1.c_str() );
-    vvvvvv_xml_append( msg, meta );
-
-    meta = vvvvvv_xml_new_element( "Desc2" );
-    vvvvvv_xml_append_text( meta, Desc2.c_str() );
-    vvvvvv_xml_append( msg, meta );
-
-    meta = vvvvvv_xml_new_element( "Desc3" );
-    vvvvvv_xml_append_text( meta, Desc3.c_str() );
-    vvvvvv_xml_append( msg, meta );
-
-    meta = vvvvvv_xml_new_element( "website" );
-    vvvvvv_xml_append_text( meta, website.c_str() );
-    vvvvvv_xml_append( msg, meta );
-
+    vvvvvv_xml_append_str(msg, "Creator", EditorData::GetInstance().creator.c_str());
+    vvvvvv_xml_append_str(msg, "Title", EditorData::GetInstance().title.c_str());
+    vvvvvv_xml_append_int(msg, "Created", version);
+    vvvvvv_xml_append_str(msg, "Modified", EditorData::GetInstance().modifier.c_str());
+    vvvvvv_xml_append_int(msg, "Modifiers", version);
+    vvvvvv_xml_append_str(msg, "Desc1", Desc1.c_str());
+    vvvvvv_xml_append_str(msg, "Desc2", Desc2.c_str());
+    vvvvvv_xml_append_str(msg, "Desc3", Desc3.c_str());
+    vvvvvv_xml_append_str(msg, "website", website.c_str());
     vvvvvv_xml_append( data, msg );
 
-    msg = vvvvvv_xml_new_element( "mapwidth" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(mapwidth).c_str() );
-    vvvvvv_xml_append( data, msg );
-
-    msg = vvvvvv_xml_new_element( "mapheight" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(mapheight).c_str() );
-    vvvvvv_xml_append( data, msg );
-
-    msg = vvvvvv_xml_new_element( "levmusic" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(levmusic).c_str() );
-    vvvvvv_xml_append( data, msg );
+    vvvvvv_xml_append_int(data, "mapwidth", mapwidth);
+    vvvvvv_xml_append_int(data, "mapheight", mapheight);
+    vvvvvv_xml_append_int(data, "levmusic", levmusic);
 
     //New save format
     std::string contentsString="";
@@ -1991,9 +1956,7 @@ void editorclass::save(std::string& _path)
             contentsString += UtilityClass::String(contents[x + (maxwidth*40*y)]) + ",";
         }
     }
-    msg = vvvvvv_xml_new_element( "contents" );
-    vvvvvv_xml_append_text( msg, contentsString.c_str() );
-    vvvvvv_xml_append( data, msg );
+    vvvvvv_xml_append_str(data, "contents", contentsString.c_str());
 
 
     //Old save format
@@ -2003,9 +1966,7 @@ void editorclass::save(std::string& _path)
     {
     	contentsString += UtilityClass::String(contents[i]) + ",";
     }
-    msg = vvvvvv_xml_new_element( "contents" );
-    vvvvvv_xml_append_text( msg, contentsString.c_str() );
-    vvvvvv_xml_append( data, msg );
+        vvvvvv_xml_append_str(data, "contents", contentsString.c_str());
     */
 
     msg = vvvvvv_xml_new_element( "edEntities" );
@@ -2021,8 +1982,7 @@ void editorclass::save(std::string& _path)
         vvvvvv_xml_set_attribute(edentityElement,  "p4", edentity[i].p4);
         vvvvvv_xml_set_attribute(edentityElement,  "p5", edentity[i].p5);
         vvvvvv_xml_set_attribute(edentityElement,   "p6", edentity[i].p6);
-        vvvvvv_xml_append_text( edentityElement, edentity[i].scriptname.c_str() ) ;
-        vvvvvv_xml_append_text( edentityElement, "" ) ;
+        vvvvvv_xml_set_text( edentityElement, edentity[i].scriptname.c_str() ) ;
         vvvvvv_xml_append( msg, edentityElement );
     }
 
@@ -2047,7 +2007,7 @@ void editorclass::save(std::string& _path)
         vvvvvv_xml_set_attribute(edlevelclassElement,   "directmode", level[i].directmode);
         vvvvvv_xml_set_attribute(edlevelclassElement,   "warpdir", level[i].warpdir);
 
-        vvvvvv_xml_append_text( edlevelclassElement, level[i].roomname.c_str() ) ;
+        vvvvvv_xml_set_text( edlevelclassElement, level[i].roomname.c_str() ) ;
         vvvvvv_xml_append( msg, edlevelclassElement );
     }
     vvvvvv_xml_append( data, msg );
@@ -2057,9 +2017,7 @@ void editorclass::save(std::string& _path)
     {
         scriptString += script.customscript[i] + "|";
     }
-    msg = vvvvvv_xml_new_element( "script" );
-    vvvvvv_xml_append_text( msg, scriptString.c_str() );
-    vvvvvv_xml_append( data, msg );
+    vvvvvv_xml_append_str(data, "script", scriptString.c_str());
 
     vvvvvv_xml_save(("levels/" + _path).c_str(), root);
 }

@@ -1,6 +1,8 @@
 #include "vxml.h"
 
 #include <memory>
+#include <sstream>
+#include <cassert>
 
 #include "tinyxml.h"
 #include "FileSystemUtils.h"
@@ -47,7 +49,25 @@ void vvvvvv_xml_append(VVVVVV_XML_Element *parent, VVVVVV_XML_Element *child) {
     parent->LinkEndChild(child);
 }
 
-void vvvvvv_xml_append_text(VVVVVV_XML_Element *parent, const char *text) {
+void vvvvvv_xml_append_bool(VVVVVV_XML_Element *parent, const char *tag_name, bool value) {
+    vvvvvv_xml_append_str(parent, tag_name, value ? "1" : "0");
+}
+
+void vvvvvv_xml_append_int(VVVVVV_XML_Element *parent, const char *tag_name, int value) {
+    std::ostringstream os;
+    os << value;
+    std::string str_value = os.str();
+    vvvvvv_xml_append_str(parent, tag_name, str_value.c_str());
+}
+
+void vvvvvv_xml_append_str(VVVVVV_XML_Element *parent, const char *tag_name, const char *value) {
+    VVVVVV_XML_Element *child = new TiXmlElement(tag_name);
+    child->LinkEndChild(new TiXmlText(value));
+    parent->LinkEndChild(child);
+}
+
+void vvvvvv_xml_set_text(VVVVVV_XML_Element *parent, const char *text) {
+    assert(parent->FirstChild() == NULL);
     parent->LinkEndChild(new TiXmlText(text));
 }
 

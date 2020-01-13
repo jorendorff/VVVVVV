@@ -24,19 +24,6 @@
 #define strcasecmp stricmp
 #endif
 
-//TODO: Non Urgent code cleanup
-const char* BoolToString(bool _b)
-{
-    if(_b)
-    {
-        return "1";
-    }
-    else
-    {
-        return "0";
-    }
-}
-
 bool GetButtonFromString(const char *pText, SDL_GameControllerButton *button)
 {
 	if (	*pText == '0' ||
@@ -517,27 +504,21 @@ void Game::savecustomlevelstats()
     vvvvvv_xml_append( root, msgs );
 
     if(numcustomlevelstats>=200)numcustomlevelstats=199;
-    msg = vvvvvv_xml_new_element( "numcustomlevelstats" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(numcustomlevelstats).c_str() );
-    vvvvvv_xml_append( msgs, msg );
+    vvvvvv_xml_append_int(msgs, "numcustomlevelstats", numcustomlevelstats);
 
     std::string customlevelscorestr;
     for(int i = 0; i < numcustomlevelstats; i++ )
     {
         customlevelscorestr += UtilityClass::String(customlevelscore[i]) + ",";
     }
-    msg = vvvvvv_xml_new_element( "customlevelscore" );
-    vvvvvv_xml_append_text( msg, customlevelscorestr.c_str() );
-    vvvvvv_xml_append( msgs, msg );
+    vvvvvv_xml_append_str(msgs, "customlevelscore", customlevelscorestr.c_str());
 
     std::string customlevelstatsstr;
     for(int i = 0; i < numcustomlevelstats; i++ )
     {
         customlevelstatsstr += customlevelstats[i] + "|";
     }
-    msg = vvvvvv_xml_new_element( "customlevelstats" );
-    vvvvvv_xml_append_text( msg, customlevelstatsstr.c_str() );
-    vvvvvv_xml_append( msgs, msg );
+    vvvvvv_xml_append_str(msgs, "customlevelstats", customlevelstatsstr.c_str());
 
     if(vvvvvv_xml_save("saves/levelstats.vvv", root))
     {
@@ -4346,8 +4327,6 @@ void Game::loadstats( mapclass& map, Graphics& dwgfx )
 
 void Game::savestats( mapclass& _map, Graphics& _dwgfx )
 {
-    VVVVVV_XML_Element* msg;
-
     VVVVVV_XML_Element * root = vvvvvv_xml_new_element( "Save" );
 
     vvvvvv_xml_append_comment( root, " Save file " );
@@ -4360,149 +4339,79 @@ void Game::savestats( mapclass& _map, Graphics& _dwgfx )
     {
         s_unlock += UtilityClass::String(unlock[i]) + ",";
     }
-    msg = vvvvvv_xml_new_element( "unlock" );
-    vvvvvv_xml_append_text( msg, s_unlock.c_str() );
-    vvvvvv_xml_append( dataNode, msg );
+    vvvvvv_xml_append_str(dataNode, "unlock", s_unlock.c_str());
 
     std::string s_unlocknotify;
     for(size_t i = 0; i < unlocknotify.size(); i++ )
     {
         s_unlocknotify += UtilityClass::String(unlocknotify[i]) + ",";
     }
-    msg = vvvvvv_xml_new_element( "unlocknotify" );
-    vvvvvv_xml_append_text( msg, s_unlocknotify.c_str() );
-    vvvvvv_xml_append( dataNode, msg );
+    vvvvvv_xml_append_str(dataNode, "unlocknotify", s_unlocknotify.c_str());
 
     std::string s_besttimes;
     for(size_t i = 0; i < besttrinkets.size(); i++ )
     {
         s_besttimes += UtilityClass::String(besttimes[i]) + ",";
     }
-    msg = vvvvvv_xml_new_element( "besttimes" );
-    vvvvvv_xml_append_text( msg, s_besttimes.c_str() );
-    vvvvvv_xml_append( dataNode, msg );
+    vvvvvv_xml_append_str(dataNode, "besttimes", s_besttimes.c_str());
 
     std::string s_besttrinkets;
     for(size_t i = 0; i < besttrinkets.size(); i++ )
     {
         s_besttrinkets += UtilityClass::String(besttrinkets[i]) + ",";
     }
-    msg = vvvvvv_xml_new_element( "besttrinkets" );
-    vvvvvv_xml_append_text( msg, s_besttrinkets.c_str() );
-    vvvvvv_xml_append( dataNode, msg );
+    vvvvvv_xml_append_str(dataNode, "besttrinkets", s_besttrinkets.c_str());
 
     std::string s_bestlives;
     for(size_t i = 0; i < bestlives.size(); i++ )
     {
         s_bestlives += UtilityClass::String(bestlives[i]) + ",";
     }
-    msg = vvvvvv_xml_new_element( "bestlives" );
-    vvvvvv_xml_append_text( msg, s_bestlives.c_str() );
-    vvvvvv_xml_append( dataNode, msg );
+    vvvvvv_xml_append_str(dataNode, "bestlives", s_bestlives.c_str());
 
     std::string s_bestrank;
     for(size_t i = 0; i < bestrank.size(); i++ )
     {
         s_bestrank += UtilityClass::String(bestrank[i]) + ",";
     }
-    msg = vvvvvv_xml_new_element( "bestrank" );
-    vvvvvv_xml_append_text( msg, s_bestrank.c_str() );
-    vvvvvv_xml_append( dataNode, msg );
+    vvvvvv_xml_append_str(dataNode, "bestrank", s_bestrank.c_str());
 
-    //for itoa ops
-    UtilityClass tu;
-    msg = vvvvvv_xml_new_element( "bestgamedeaths" );
-    vvvvvv_xml_append_text( msg, tu.String(bestgamedeaths).c_str() );
-    vvvvvv_xml_append( dataNode, msg );
-    msg = vvvvvv_xml_new_element( "stat_trinkets" );
-    vvvvvv_xml_append_text( msg, tu.String(stat_trinkets).c_str());
-    vvvvvv_xml_append( dataNode, msg );
-
-    msg = vvvvvv_xml_new_element( "fullscreen" );
-    vvvvvv_xml_append_text( msg, tu.String(fullscreen).c_str());
-    vvvvvv_xml_append( dataNode, msg );
-
-    msg = vvvvvv_xml_new_element( "stretch" );
-    vvvvvv_xml_append_text( msg, tu.String(stretchMode).c_str());
-    vvvvvv_xml_append( dataNode, msg );
-
-    msg = vvvvvv_xml_new_element( "useLinearFilter" );
-    vvvvvv_xml_append_text( msg, tu.String(useLinearFilter).c_str());
-    vvvvvv_xml_append( dataNode, msg );
+    vvvvvv_xml_append_int(dataNode, "bestgamedeaths", bestgamedeaths);
+    vvvvvv_xml_append_int(dataNode, "stat_trinkets", stat_trinkets);
+    vvvvvv_xml_append_int(dataNode, "fullscreen", fullscreen);
+    vvvvvv_xml_append_int(dataNode, "stretch", stretchMode);
+    vvvvvv_xml_append_int(dataNode, "useLinearFilter", useLinearFilter);
 
     int width, height;
     _dwgfx.screenbuffer->GetWindowSize(&width, &height);
-    msg = vvvvvv_xml_new_element( "window_width" );
-    vvvvvv_xml_append_text( msg, tu.String(width).c_str());
-    vvvvvv_xml_append( dataNode, msg );
-    msg = vvvvvv_xml_new_element( "window_height" );
-    vvvvvv_xml_append_text( msg, tu.String(height).c_str());
-    vvvvvv_xml_append( dataNode, msg );
+    vvvvvv_xml_append_int(dataNode, "window_width", width);
+    vvvvvv_xml_append_int(dataNode, "window_height", height);
 
-    msg = vvvvvv_xml_new_element( "noflashingmode" );
-    vvvvvv_xml_append_text( msg, tu.String(noflashingmode).c_str());
-    vvvvvv_xml_append( dataNode, msg );
-
-    msg = vvvvvv_xml_new_element( "colourblindmode" );
-    vvvvvv_xml_append_text( msg, tu.String(colourblindmode).c_str());
-    vvvvvv_xml_append( dataNode, msg );
-
-    msg = vvvvvv_xml_new_element( "setflipmode" );
-    vvvvvv_xml_append_text( msg, tu.String(_dwgfx.setflipmode).c_str());
-    vvvvvv_xml_append( dataNode, msg );
-
-    msg = vvvvvv_xml_new_element( "invincibility" );
-    vvvvvv_xml_append_text( msg, tu.String(_map.invincibility).c_str());
-    vvvvvv_xml_append( dataNode, msg );
-
-    msg = vvvvvv_xml_new_element( "slowdown" );
-    vvvvvv_xml_append_text( msg, tu.String(slowdown).c_str());
-    vvvvvv_xml_append( dataNode, msg );
-
-    msg = vvvvvv_xml_new_element( "swnbestrank" );
-    vvvvvv_xml_append_text( msg, tu.String(swnbestrank).c_str());
-    vvvvvv_xml_append( dataNode, msg );
-
-    msg = vvvvvv_xml_new_element( "swnrecord" );
-    vvvvvv_xml_append_text( msg, tu.String(swnrecord).c_str());
-    vvvvvv_xml_append( dataNode, msg );
-
-
-    msg = vvvvvv_xml_new_element( "advanced_mode" );
-    vvvvvv_xml_append_text( msg, tu.String(advanced_mode).c_str());
-    vvvvvv_xml_append( dataNode, msg );
-
-    msg = vvvvvv_xml_new_element( "advanced_smoothing" );
-    vvvvvv_xml_append_text( msg, tu.String(fullScreenEffect_badSignal).c_str());
-    vvvvvv_xml_append( dataNode, msg );
-
-		
-    msg = vvvvvv_xml_new_element( "usingmmmmmm" );
-    vvvvvv_xml_append_text( msg, tu.String(usingmmmmmm).c_str());
-    vvvvvv_xml_append( dataNode, msg );
+    vvvvvv_xml_append_int(dataNode, "noflashingmode", noflashingmode);
+    vvvvvv_xml_append_int(dataNode, "colourblindmode", colourblindmode);
+    vvvvvv_xml_append_int(dataNode, "setflipmode", _dwgfx.setflipmode);
+    vvvvvv_xml_append_int(dataNode, "invincibility", _map.invincibility);
+    vvvvvv_xml_append_int(dataNode, "slowdown", slowdown);
+    vvvvvv_xml_append_int(dataNode, "swnbestrank", swnbestrank);
+    vvvvvv_xml_append_int(dataNode, "swnrecord", swnrecord);
+    vvvvvv_xml_append_int(dataNode, "advanced_mode", advanced_mode);
+    vvvvvv_xml_append_int(dataNode, "advanced_smoothing", fullScreenEffect_badSignal);
+    vvvvvv_xml_append_int(dataNode, "usingmmmmmm", usingmmmmmm);
 
     for (size_t i = 0; i < controllerButton_flip.size(); i += 1)
     {
-        msg = vvvvvv_xml_new_element("flipButton");
-        vvvvvv_xml_append_text(msg, tu.String((int) controllerButton_flip[i]).c_str());
-        vvvvvv_xml_append( dataNode,msg);
+        vvvvvv_xml_append_int(dataNode, "flipButton", (int) controllerButton_flip[i]);
     }
     for (size_t i = 0; i < controllerButton_map.size(); i += 1)
     {
-        msg = vvvvvv_xml_new_element("enterButton");
-        vvvvvv_xml_append_text(msg, tu.String((int) controllerButton_map[i]).c_str());
-        vvvvvv_xml_append( dataNode,msg);
+        vvvvvv_xml_append_int(dataNode, "enterButton", (int) controllerButton_map[i]);
     }
     for (size_t i = 0; i < controllerButton_esc.size(); i += 1)
     {
-        msg = vvvvvv_xml_new_element("escButton");
-        vvvvvv_xml_append_text(msg, tu.String((int) controllerButton_esc[i]).c_str());
-        vvvvvv_xml_append( dataNode,msg);
+        vvvvvv_xml_append_int(dataNode, "escButton", (int) controllerButton_esc[i]);
     }
 
-	msg = vvvvvv_xml_new_element( "controllerSensitivity" );
-	vvvvvv_xml_append_text( msg, tu.String(controllerSensitivity).c_str());
-	vvvvvv_xml_append( dataNode, msg );
+    vvvvvv_xml_append_int(dataNode, "controllerSensitivity", controllerSensitivity);
 
     vvvvvv_xml_save("saves/unlock.vvv", root);
 }
@@ -5424,36 +5333,28 @@ void Game::savetele( mapclass& map, entityclass& obj, musicclass& music )
     {
         mapExplored += UtilityClass::String(map.explored[i]) + ",";
     }
-    msg = vvvvvv_xml_new_element( "worldmap" );
-    vvvvvv_xml_append_text( msg, mapExplored.c_str() );
-    vvvvvv_xml_append( msgs, msg );
+    vvvvvv_xml_append_str(msgs, "worldmap", mapExplored.c_str());
 
     std::string flags;
     for(size_t i = 0; i < obj.flags.size(); i++ )
     {
         flags += UtilityClass::String(obj.flags[i]) + ",";
     }
-    msg = vvvvvv_xml_new_element( "flags" );
-    vvvvvv_xml_append_text( msg, flags.c_str() );
-    vvvvvv_xml_append( msgs, msg );
+    vvvvvv_xml_append_str(msgs, "flags", flags.c_str());
 
     std::string crewstatsString;
     for(size_t i = 0; i < crewstats.size(); i++ )
     {
         crewstatsString += UtilityClass::String(crewstats[i]) + ",";
     }
-    msg = vvvvvv_xml_new_element( "crewstats" );
-    vvvvvv_xml_append_text( msg, crewstatsString.c_str() );
-    vvvvvv_xml_append( msgs, msg );
+    vvvvvv_xml_append_str(msgs, "crewstats", crewstatsString.c_str());
 
     std::string collect;
     for(size_t i = 0; i < obj.collect.size(); i++ )
     {
         collect += UtilityClass::String(obj.collect[i]) + ",";
     }
-    msg = vvvvvv_xml_new_element( "collect" );
-    vvvvvv_xml_append_text( msg, collect.c_str() );
-    vvvvvv_xml_append( msgs, msg );
+    vvvvvv_xml_append_str(msgs, "collect", collect.c_str());
 
     //telecookie.data.finalx = map.finalx;
     //telecookie.data.finaly = map.finaly;
@@ -5461,29 +5362,12 @@ void Game::savetele( mapclass& map, entityclass& obj, musicclass& music )
     //telecookie.data.savex = savex;
     //telecookie.data.savey = savey;
 
-    msg = vvvvvv_xml_new_element( "finalx" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(map.finalx).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "finaly" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(map.finaly).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "savex" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(savex).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "savey" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(savey).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "saverx" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(saverx).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "savery" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(savery).c_str() );
-    vvvvvv_xml_append( msgs, msg );
+    vvvvvv_xml_append_int(msgs, "finalx", map.finalx);
+    vvvvvv_xml_append_int(msgs, "finaly", map.finaly);
+    vvvvvv_xml_append_int(msgs, "savex", savex);
+    vvvvvv_xml_append_int(msgs, "savey", savey);
+    vvvvvv_xml_append_int(msgs, "saverx", saverx);
+    vvvvvv_xml_append_int(msgs, "savery", savery);
 
     //telecookie.data.saverx = saverx;
     //telecookie.data.savery = savery;
@@ -5492,22 +5376,10 @@ void Game::savetele( mapclass& map, entityclass& obj, musicclass& music )
     //telecookie.data.savepoint = savepoint;
     //telecookie.data.trinkets = trinkets;
 
-    msg = vvvvvv_xml_new_element( "savegc" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(savegc).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "savedir" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(savedir).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "savepoint" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(savepoint).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "trinkets" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(trinkets).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
+    vvvvvv_xml_append_int(msgs, "savegc", savegc);
+    vvvvvv_xml_append_int(msgs, "savedir", savedir);
+    vvvvvv_xml_append_int(msgs, "savepoint", savepoint);
+    vvvvvv_xml_append_int(msgs, "trinkets", trinkets);
 
     //if (music.nicechange != -1) {
     //telecookie.data.currentsong = music.nicechange;
@@ -5525,38 +5397,19 @@ void Game::savetele( mapclass& map, entityclass& obj, musicclass& music )
 
     if(music.nicefade==1)
     {
-        msg = vvvvvv_xml_new_element( "currentsong" );
-        vvvvvv_xml_append_text( msg, UtilityClass::String(music.nicechange).c_str() );
-        vvvvvv_xml_append( msgs, msg );
+        vvvvvv_xml_append_int(msgs, "currentsong", music.nicechange);
     }
     else
     {
-        msg = vvvvvv_xml_new_element( "currentsong" );
-        vvvvvv_xml_append_text( msg, UtilityClass::String(music.currentsong).c_str() );
-        vvvvvv_xml_append( msgs, msg );
+        vvvvvv_xml_append_int(msgs, "currentsong", music.currentsong);
     }
 
-    msg = vvvvvv_xml_new_element( "teleportscript" );
-    vvvvvv_xml_append_text( msg, teleportscript.c_str() );
-    vvvvvv_xml_append( msgs, msg );
-    msg = vvvvvv_xml_new_element( "companion" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(companion).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "lastsaved" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(lastsaved).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-    msg = vvvvvv_xml_new_element( "supercrewmate" );
-    vvvvvv_xml_append_text( msg, BoolToString(supercrewmate) );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "scmprogress" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(scmprogress).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-    msg = vvvvvv_xml_new_element( "scmmoveme" );
-    vvvvvv_xml_append_text( msg, BoolToString(scmmoveme) );
-    vvvvvv_xml_append( msgs, msg );
-
+    vvvvvv_xml_append_str(msgs, "teleportscript", teleportscript.c_str());
+    vvvvvv_xml_append_int(msgs, "companion", companion);
+    vvvvvv_xml_append_int(msgs, "lastsaved", lastsaved);
+    vvvvvv_xml_append_bool(msgs, "supercrewmate", supercrewmate);
+    vvvvvv_xml_append_int(msgs, "scmprogress", scmprogress);
+    vvvvvv_xml_append_bool(msgs, "scmmoveme", scmmoveme);
 
     //telecookie.data.frames = frames; telecookie.data.seconds = seconds;
     //telecookie.data.minutes = minutes; telecookie.data.hours = hours;
@@ -5569,48 +5422,20 @@ void Game::savetele( mapclass& map, entityclass& obj, musicclass& music )
     //telecookie.data.summary = savearea + ", " + timestring(help);
     //telesummary = telecookie.data.summary;
 
+    vvvvvv_xml_append_int(msgs, "frames", frames);
+    vvvvvv_xml_append_int(msgs, "seconds", seconds);
+    vvvvvv_xml_append_int(msgs, "minutes", minutes);
+    vvvvvv_xml_append_int(msgs, "hours", hours);
+    vvvvvv_xml_append_int(msgs, "deathcounts", deathcounts);
+    vvvvvv_xml_append_int(msgs, "totalflips", totalflips);
+    vvvvvv_xml_append_str(msgs, "hardestroom", hardestroom.c_str());
+    vvvvvv_xml_append_int(msgs, "hardestroomdeaths", hardestroomdeaths);
+    vvvvvv_xml_append_bool(msgs, "finalmode", map.finalmode);
+    vvvvvv_xml_append_bool(msgs, "finalstretch", map.finalstretch);
 
-    msg = vvvvvv_xml_new_element( "frames" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(frames).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-    msg = vvvvvv_xml_new_element( "seconds" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(seconds).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "minutes" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(minutes).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-    msg = vvvvvv_xml_new_element( "hours" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(hours).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "deathcounts" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(deathcounts).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-    msg = vvvvvv_xml_new_element( "totalflips" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(totalflips).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "hardestroom" );
-    vvvvvv_xml_append_text( msg, hardestroom.c_str() );
-    vvvvvv_xml_append( msgs, msg );
-    msg = vvvvvv_xml_new_element( "hardestroomdeaths" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(hardestroomdeaths).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "finalmode" );
-    vvvvvv_xml_append_text( msg, BoolToString(map.finalmode));
-    vvvvvv_xml_append( msgs, msg );
-    msg = vvvvvv_xml_new_element( "finalstretch" );
-    vvvvvv_xml_append_text( msg, BoolToString(map.finalstretch) );
-    vvvvvv_xml_append( msgs, msg );
-
-
-    msg = vvvvvv_xml_new_element( "summary" );
     UtilityClass tempUtil;
     std::string summary = savearea + ", " + timestring(tempUtil);
-    vvvvvv_xml_append_text( msg, summary.c_str() );
-    vvvvvv_xml_append( msgs, msg );
+    vvvvvv_xml_append_str(msgs, "summary", summary.c_str());
 
     telesummary = summary;
     //telecookie.flush();
@@ -5660,36 +5485,28 @@ void Game::savequick( mapclass& map, entityclass& obj, musicclass& music )
     {
         mapExplored += UtilityClass::String(map.explored[i]) + ",";
     }
-    msg = vvvvvv_xml_new_element( "worldmap" );
-    vvvvvv_xml_append_text( msg, mapExplored.c_str() );
-    vvvvvv_xml_append( msgs, msg );
+    vvvvvv_xml_append_str(msgs, "worldmap", mapExplored.c_str());
 
     std::string flags;
     for(size_t i = 0; i < obj.flags.size(); i++ )
     {
         flags += UtilityClass::String(obj.flags[i]) + ",";
     }
-    msg = vvvvvv_xml_new_element( "flags" );
-    vvvvvv_xml_append_text( msg, flags.c_str() );
-    vvvvvv_xml_append( msgs, msg );
+    vvvvvv_xml_append_str(msgs, "flags", flags.c_str());
 
     std::string crewstatsString;
     for(size_t i = 0; i < crewstats.size(); i++ )
     {
         crewstatsString += UtilityClass::String(crewstats[i]) + ",";
     }
-    msg = vvvvvv_xml_new_element( "crewstats" );
-    vvvvvv_xml_append_text( msg, crewstatsString.c_str() );
-    vvvvvv_xml_append( msgs, msg );
+    vvvvvv_xml_append_str(msgs, "crewstats", crewstatsString.c_str());
 
     std::string collect;
     for(size_t i = 0; i < obj.collect.size(); i++ )
     {
         collect += UtilityClass::String(obj.collect[i]) + ",";
     }
-    msg = vvvvvv_xml_new_element( "collect" );
-    vvvvvv_xml_append_text( msg, collect.c_str() );
-    vvvvvv_xml_append( msgs, msg );
+    vvvvvv_xml_append_str(msgs, "collect", collect.c_str());
 
     //telecookie.data.finalx = map.finalx;
     //telecookie.data.finaly = map.finaly;
@@ -5697,29 +5514,12 @@ void Game::savequick( mapclass& map, entityclass& obj, musicclass& music )
     //telecookie.data.savex = savex;
     //telecookie.data.savey = savey;
 
-    msg = vvvvvv_xml_new_element( "finalx" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(map.finalx).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "finaly" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(map.finaly).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "savex" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(savex).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "savey" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(savey).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "saverx" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(saverx).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "savery" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(savery).c_str() );
-    vvvvvv_xml_append( msgs, msg );
+    vvvvvv_xml_append_int(msgs, "finalx", map.finalx);
+    vvvvvv_xml_append_int(msgs, "finaly", map.finaly);
+    vvvvvv_xml_append_int(msgs, "savex", savex);
+    vvvvvv_xml_append_int(msgs, "savey", savey);
+    vvvvvv_xml_append_int(msgs, "saverx", saverx);
+    vvvvvv_xml_append_int(msgs, "savery", savery);
 
     //telecookie.data.saverx = saverx;
     //telecookie.data.savery = savery;
@@ -5728,22 +5528,10 @@ void Game::savequick( mapclass& map, entityclass& obj, musicclass& music )
     //telecookie.data.savepoint = savepoint;
     //telecookie.data.trinkets = trinkets;
 
-    msg = vvvvvv_xml_new_element( "savegc" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(savegc).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "savedir" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(savedir).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "savepoint" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(savepoint).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "trinkets" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(trinkets).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
+    vvvvvv_xml_append_int(msgs, "savegc", savegc);
+    vvvvvv_xml_append_int(msgs, "savedir", savedir);
+    vvvvvv_xml_append_int(msgs, "savepoint", savepoint);
+    vvvvvv_xml_append_int(msgs, "trinkets", trinkets);
 
     //if (music.nicechange != -1) {
     //telecookie.data.currentsong = music.nicechange;
@@ -5760,48 +5548,25 @@ void Game::savequick( mapclass& map, entityclass& obj, musicclass& music )
     //telecookie.data.scmmoveme = scmmoveme;
     if(music.nicefade==1)
     {
-        msg = vvvvvv_xml_new_element( "currentsong" );
-        vvvvvv_xml_append_text( msg, UtilityClass::String(music.nicechange).c_str() );
-        vvvvvv_xml_append( msgs, msg );
+        vvvvvv_xml_append_int(msgs, "currentsong", music.nicechange);
     }
     else
     {
-        msg = vvvvvv_xml_new_element( "currentsong" );
-        vvvvvv_xml_append_text( msg, UtilityClass::String(music.currentsong).c_str() );
-        vvvvvv_xml_append( msgs, msg );
+        vvvvvv_xml_append_int(msgs, "currentsong", music.currentsong);
     }
 
-    msg = vvvvvv_xml_new_element( "teleportscript" );
-    vvvvvv_xml_append_text( msg, teleportscript.c_str() );
-    vvvvvv_xml_append( msgs, msg );
-    msg = vvvvvv_xml_new_element( "companion" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(companion).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "lastsaved" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(lastsaved).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-    msg = vvvvvv_xml_new_element( "supercrewmate" );
-    vvvvvv_xml_append_text( msg, BoolToString(supercrewmate) );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "scmprogress" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(scmprogress).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-    msg = vvvvvv_xml_new_element( "scmmoveme" );
-    vvvvvv_xml_append_text( msg, BoolToString(scmmoveme) );
-    vvvvvv_xml_append( msgs, msg );
-
+    vvvvvv_xml_append_str(msgs, "teleportscript", teleportscript.c_str());
+    vvvvvv_xml_append_int(msgs, "companion", companion);
+    vvvvvv_xml_append_int(msgs, "lastsaved", lastsaved);
+    vvvvvv_xml_append_bool(msgs, "supercrewmate", supercrewmate);
+    vvvvvv_xml_append_int(msgs, "scmprogress", scmprogress);
+    vvvvvv_xml_append_bool(msgs, "scmmoveme", scmmoveme);
 
     //telecookie.data.finalmode = map.finalmode;
     //telecookie.data.finalstretch = map.finalstretch;
 
-    msg = vvvvvv_xml_new_element( "finalmode" );
-    vvvvvv_xml_append_text( msg, BoolToString(map.finalmode) );
-    vvvvvv_xml_append( msgs, msg );
-    msg = vvvvvv_xml_new_element( "finalstretch" );
-    vvvvvv_xml_append_text( msg, BoolToString(map.finalstretch) );
-    vvvvvv_xml_append( msgs, msg );
+    vvvvvv_xml_append_bool(msgs, "finalmode", map.finalmode);
+    vvvvvv_xml_append_bool(msgs, "finalstretch", map.finalstretch);
 
     //telecookie.data.frames = frames; telecookie.data.seconds = seconds;
     //telecookie.data.minutes = minutes; telecookie.data.hours = hours;
@@ -5814,40 +5579,18 @@ void Game::savequick( mapclass& map, entityclass& obj, musicclass& music )
     //telecookie.data.summary = savearea + ", " + timestring(help);
     //telesummary = telecookie.data.summary;
 
+    vvvvvv_xml_append_int(msgs, "frames", frames);
+    vvvvvv_xml_append_int(msgs, "seconds", seconds);
+    vvvvvv_xml_append_int(msgs, "minutes", minutes);
+    vvvvvv_xml_append_int(msgs, "hours", hours);
+    vvvvvv_xml_append_int(msgs, "deathcounts", deathcounts);
+    vvvvvv_xml_append_int(msgs, "totalflips", totalflips);
+    vvvvvv_xml_append_str(msgs, "hardestroom", hardestroom.c_str());
+    vvvvvv_xml_append_int(msgs, "hardestroomdeaths", hardestroomdeaths);
 
-    msg = vvvvvv_xml_new_element( "frames" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(frames).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-    msg = vvvvvv_xml_new_element( "seconds" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(seconds).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "minutes" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(minutes).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-    msg = vvvvvv_xml_new_element( "hours" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(hours).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "deathcounts" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(deathcounts).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-    msg = vvvvvv_xml_new_element( "totalflips" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(totalflips).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "hardestroom" );
-    vvvvvv_xml_append_text( msg, hardestroom.c_str() );
-    vvvvvv_xml_append( msgs, msg );
-    msg = vvvvvv_xml_new_element( "hardestroomdeaths" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(hardestroomdeaths).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "summary" );
     UtilityClass tempUtil;
     std::string summary = savearea + ", " + timestring(tempUtil);
-    vvvvvv_xml_append_text( msg, summary.c_str() );
-    vvvvvv_xml_append( msgs, msg );
+    vvvvvv_xml_append_str(msgs, "summary", summary.c_str());
 
     quicksummary = summary;
     //telecookie.flush();
@@ -5897,54 +5640,42 @@ void Game::customsavequick(std::string savfile, mapclass& map, entityclass& obj,
     {
         mapExplored += UtilityClass::String(map.explored[i]) + ",";
     }
-    msg = vvvvvv_xml_new_element( "worldmap" );
-    vvvvvv_xml_append_text( msg, mapExplored.c_str() );
-    vvvvvv_xml_append( msgs, msg );
+    vvvvvv_xml_append_str(msgs, "worldmap", mapExplored.c_str());
 
     std::string flags;
     for(size_t i = 0; i < obj.flags.size(); i++ )
     {
         flags += UtilityClass::String(obj.flags[i]) + ",";
     }
-    msg = vvvvvv_xml_new_element( "flags" );
-    vvvvvv_xml_append_text( msg, flags.c_str() );
-    vvvvvv_xml_append( msgs, msg );
+    vvvvvv_xml_append_str(msgs, "flags", flags.c_str());
 
     std::string moods;
     for(int i = 0; i < 6; i++ )
     {
         moods += UtilityClass::String(obj.customcrewmoods[i]) + ",";
     }
-    msg = vvvvvv_xml_new_element( "moods" );
-    vvvvvv_xml_append_text( msg, moods.c_str() );
-    vvvvvv_xml_append( msgs, msg );
+    vvvvvv_xml_append_str(msgs, "moods", moods.c_str());
 
     std::string crewstatsString;
     for(size_t i = 0; i < crewstats.size(); i++ )
     {
         crewstatsString += UtilityClass::String(crewstats[i]) + ",";
     }
-    msg = vvvvvv_xml_new_element( "crewstats" );
-    vvvvvv_xml_append_text( msg, crewstatsString.c_str() );
-    vvvvvv_xml_append( msgs, msg );
+    vvvvvv_xml_append_str(msgs, "crewstats", crewstatsString.c_str());
 
     std::string collect;
     for(size_t i = 0; i < obj.collect.size(); i++ )
     {
         collect += UtilityClass::String(obj.collect[i]) + ",";
     }
-    msg = vvvvvv_xml_new_element( "collect" );
-    vvvvvv_xml_append_text( msg, collect.c_str() );
-    vvvvvv_xml_append( msgs, msg );
+    vvvvvv_xml_append_str(msgs, "collect", collect.c_str());
 
     std::string customcollect;
     for(size_t i = 0; i < obj.customcollect.size(); i++ )
     {
         customcollect += UtilityClass::String(obj.customcollect[i]) + ",";
     }
-    msg = vvvvvv_xml_new_element( "customcollect" );
-    vvvvvv_xml_append_text( msg, customcollect.c_str() );
-    vvvvvv_xml_append( msgs, msg );
+    vvvvvv_xml_append_str(msgs, "customcollect", customcollect.c_str());
 
     //telecookie.data.finalx = map.finalx;
     //telecookie.data.finaly = map.finaly;
@@ -5952,29 +5683,12 @@ void Game::customsavequick(std::string savfile, mapclass& map, entityclass& obj,
     //telecookie.data.savex = savex;
     //telecookie.data.savey = savey;
 
-    msg = vvvvvv_xml_new_element( "finalx" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(map.finalx).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "finaly" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(map.finaly).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "savex" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(savex).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "savey" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(savey).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "saverx" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(saverx).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "savery" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(savery).c_str() );
-    vvvvvv_xml_append( msgs, msg );
+    vvvvvv_xml_append_int(msgs, "finalx", map.finalx);
+    vvvvvv_xml_append_int(msgs, "finaly", map.finaly);
+    vvvvvv_xml_append_int(msgs, "savex", savex);
+    vvvvvv_xml_append_int(msgs, "savey", savey);
+    vvvvvv_xml_append_int(msgs, "saverx", saverx);
+    vvvvvv_xml_append_int(msgs, "savery", savery);
 
     //telecookie.data.saverx = saverx;
     //telecookie.data.savery = savery;
@@ -5983,26 +5697,11 @@ void Game::customsavequick(std::string savfile, mapclass& map, entityclass& obj,
     //telecookie.data.savepoint = savepoint;
     //telecookie.data.trinkets = trinkets;
 
-    msg = vvvvvv_xml_new_element( "savegc" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(savegc).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "savedir" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(savedir).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "savepoint" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(savepoint).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "trinkets" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(trinkets).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "crewmates" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(crewmates).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
+    vvvvvv_xml_append_int(msgs, "savegc", savegc);
+    vvvvvv_xml_append_int(msgs, "savedir", savedir);
+    vvvvvv_xml_append_int(msgs, "savepoint", savepoint);
+    vvvvvv_xml_append_int(msgs, "trinkets", trinkets);
+    vvvvvv_xml_append_int(msgs, "crewmates", crewmates);
 
     //if (music.nicechange != -1) {
     //telecookie.data.currentsong = music.nicechange;
@@ -6019,38 +5718,19 @@ void Game::customsavequick(std::string savfile, mapclass& map, entityclass& obj,
     //telecookie.data.scmmoveme = scmmoveme;
     if(music.nicefade==1)
     {
-        msg = vvvvvv_xml_new_element( "currentsong" );
-        vvvvvv_xml_append_text( msg, UtilityClass::String(music.nicechange).c_str() );
-        vvvvvv_xml_append( msgs, msg );
+        vvvvvv_xml_append_int(msgs, "currentsong", music.nicechange);
     }
     else
     {
-        msg = vvvvvv_xml_new_element( "currentsong" );
-        vvvvvv_xml_append_text( msg, UtilityClass::String(music.currentsong).c_str() );
-        vvvvvv_xml_append( msgs, msg );
+        vvvvvv_xml_append_int(msgs, "currentsong", music.currentsong);
     }
 
-    msg = vvvvvv_xml_new_element( "teleportscript" );
-    vvvvvv_xml_append_text( msg, teleportscript.c_str() );
-    vvvvvv_xml_append( msgs, msg );
-    msg = vvvvvv_xml_new_element( "companion" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(companion).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "lastsaved" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(lastsaved).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-    msg = vvvvvv_xml_new_element( "supercrewmate" );
-    vvvvvv_xml_append_text( msg, BoolToString(supercrewmate) );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "scmprogress" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(scmprogress).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-    msg = vvvvvv_xml_new_element( "scmmoveme" );
-    vvvvvv_xml_append_text( msg, BoolToString(scmmoveme) );
-    vvvvvv_xml_append( msgs, msg );
-
+    vvvvvv_xml_append_str(msgs, "teleportscript", teleportscript.c_str());
+    vvvvvv_xml_append_int(msgs, "companion", companion);
+    vvvvvv_xml_append_int(msgs, "lastsaved", lastsaved);
+    vvvvvv_xml_append_bool(msgs, "supercrewmate", supercrewmate);
+    vvvvvv_xml_append_int(msgs, "scmprogress", scmprogress);
+    vvvvvv_xml_append_bool(msgs, "scmmoveme", scmmoveme);
 
     //telecookie.data.frames = frames; telecookie.data.seconds = seconds;
     //telecookie.data.minutes = minutes; telecookie.data.hours = hours;
@@ -6063,44 +5743,19 @@ void Game::customsavequick(std::string savfile, mapclass& map, entityclass& obj,
     //telecookie.data.summary = savearea + ", " + timestring(help);
     //telesummary = telecookie.data.summary;
 
+    vvvvvv_xml_append_int(msgs, "frames", frames);
+    vvvvvv_xml_append_int(msgs, "seconds", seconds);
+    vvvvvv_xml_append_int(msgs, "minutes", minutes);
+    vvvvvv_xml_append_int(msgs, "hours", hours);
+    vvvvvv_xml_append_int(msgs, "deathcounts", deathcounts);
+    vvvvvv_xml_append_int(msgs, "totalflips", totalflips);
+    vvvvvv_xml_append_str(msgs, "hardestroom", hardestroom.c_str());
+    vvvvvv_xml_append_int(msgs, "hardestroomdeaths", hardestroomdeaths);
+    vvvvvv_xml_append_bool(msgs, "showminimap", map.customshowmm);
 
-    msg = vvvvvv_xml_new_element( "frames" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(frames).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-    msg = vvvvvv_xml_new_element( "seconds" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(seconds).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "minutes" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(minutes).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-    msg = vvvvvv_xml_new_element( "hours" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(hours).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "deathcounts" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(deathcounts).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-    msg = vvvvvv_xml_new_element( "totalflips" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(totalflips).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "hardestroom" );
-    vvvvvv_xml_append_text( msg, hardestroom.c_str() );
-    vvvvvv_xml_append( msgs, msg );
-    msg = vvvvvv_xml_new_element( "hardestroomdeaths" );
-    vvvvvv_xml_append_text( msg, UtilityClass::String(hardestroomdeaths).c_str() );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "showminimap" );
-    vvvvvv_xml_append_text( msg, BoolToString(map.customshowmm) );
-    vvvvvv_xml_append( msgs, msg );
-
-    msg = vvvvvv_xml_new_element( "summary" );
     UtilityClass tempUtil;
     std::string summary = savearea + ", " + timestring(tempUtil);
-    vvvvvv_xml_append_text( msg, summary.c_str() );
-    vvvvvv_xml_append( msgs, msg );
+    vvvvvv_xml_append_str(msgs, "summary", summary.c_str());
 
     customquicksummary = summary;
     //telecookie.flush();

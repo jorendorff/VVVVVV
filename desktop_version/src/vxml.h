@@ -28,7 +28,14 @@ extern "C" {
 
     void vvvvvv_xml_append(VVVVVV_XML_Element *parent, VVVVVV_XML_Element *child);
 
-    void vvvvvv_xml_append_text(VVVVVV_XML_Element *parent, const char *text);
+    void vvvvvv_xml_append_bool(VVVVVV_XML_Element *parent, const char *tag_name, bool value);
+
+    void vvvvvv_xml_append_int(VVVVVV_XML_Element *parent, const char *tag_name, int value);
+
+    void vvvvvv_xml_append_str(VVVVVV_XML_Element *parent, const char *tag_name, const char *value);
+
+    // Call this only if the element is empty.
+    void vvvvvv_xml_set_text(VVVVVV_XML_Element *parent, const char *text);
 
     void vvvvvv_xml_append_comment(VVVVVV_XML_Element *parent, const char *comment_text);
 
