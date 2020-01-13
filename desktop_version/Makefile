@@ -48,7 +48,8 @@ CXX_OBJECT_FILES=\
 	src/editor.o \
 	src/main.o \
 	src/preloader.o \
-	src/titlerender.o
+	src/titlerender.o \
+	src/vxml.o
 
 COMMON_FLAGS=-Os -I vvvvvv_pieces -I /usr/local/Cellar/sdl2_mixer/2.0.4/include/SDL2 -I /usr/local/Cellar/sdl2/2.0.10/include/SDL2 -I ../third_party/physfs -I ../third_party/tinyxml -D PHYSFS_SUPPORTS_DEFAULT=0 -D PHYSFS_SUPPORTS_ZIP=1 -D PHYSFS_PLATFORM_POSIX=1 -D PHYSFS_PLATFORM_UNIX=1 -D PHYSFS_NO_CDROM_SUPPORT=1
 CXXFLAGS=$(COMMON_FLAGS)

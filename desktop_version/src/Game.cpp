@@ -13,7 +13,7 @@
 
 #include "FileSystemUtils.h"
 
-#include "tinyxml.h"
+#include "vxml.h"
 
 #include "Network.h"
 
@@ -293,8 +293,8 @@ Game::Game(void):
 
     saveFilePath = FILESYSTEM_getUserSaveDirectory();
 
-    TiXmlDocument doc;
-    if (!FILESYSTEM_loadTiXmlDocument("saves/qsave.vvv", &doc))
+    VVVVVV_XML_Document *doc = vvvvvv_xml_load("saves/qsave.vvv");
+    if (!doc)
     {
         quickcookieexists = false;
         quicksummary = "";
@@ -303,23 +303,13 @@ Game::Game(void):
     else
     {
         quickcookieexists = true;
-        TiXmlHandle hDoc(&doc);
-        TiXmlElement* pElem;
-        TiXmlHandle hRoot(0);
+        VVVVVV_XML_Element *pElem;
+        VVVVVV_XML_Element *hRoot = vvvvvv_xml_root(doc);
 
-        pElem=hDoc.FirstChildElement().Element();
-        if (!pElem)
+        for( pElem = vvvvvv_xml_first_child_element(vvvvvv_xml_first_child_element_named( hRoot, "Data" )); pElem; pElem=vvvvvv_xml_next_sibling_element(pElem))
         {
-            printf("Quick Save Appears Corrupted: No XML Root\n");
-        }
-
-        // save this for later
-        hRoot=TiXmlHandle(pElem);
-
-        for( pElem = hRoot.FirstChild( "Data" ).FirstChild().Element(); pElem; pElem=pElem->NextSiblingElement())
-        {
-            std::string pKey(pElem->Value());
-            const char* pText = pElem->GetText() ;
+            std::string pKey(vvvvvv_xml_name(pElem));
+            const char* pText = vvvvvv_xml_text(pElem) ;
 
             if (pKey == "summary")
             {
@@ -328,11 +318,12 @@ Game::Game(void):
 
 
         }
+        vvvvvv_xml_free(doc);
     }
 
 
-    TiXmlDocument docTele;
-    if (!FILESYSTEM_loadTiXmlDocument("saves/tsave.vvv", &docTele))
+    VVVVVV_XML_Document *docTele = vvvvvv_xml_load("saves/tsave.vvv");
+    if (!docTele)
     {
         telecookieexists = false;
         telesummary = "";
@@ -341,27 +332,13 @@ Game::Game(void):
     else
     {
         telecookieexists = true;
-        TiXmlHandle hDoc(&docTele);
-        TiXmlElement* pElem;
-        TiXmlHandle hRoot(0);
+        VVVVVV_XML_Element *pElem;
+        VVVVVV_XML_Element *hRoot = vvvvvv_xml_root(docTele);
 
-
+        for( pElem = vvvvvv_xml_first_child_element(vvvvvv_xml_first_child_element_named( hRoot, "Data" )); pElem; pElem=vvvvvv_xml_next_sibling_element(pElem))
         {
-            pElem=hDoc.FirstChildElement().Element();
-            // should always have a valid root but handle gracefully if it does
-            if (!pElem)
-            {
-                printf("Teleporter Save Appears Corrupted: No XML Root\n");
-            }
-
-            // save this for later
-            hRoot=TiXmlHandle(pElem);
-        }
-
-        for( pElem = hRoot.FirstChild( "Data" ).FirstChild().Element(); pElem; pElem=pElem->NextSiblingElement())
-        {
-            std::string pKey(pElem->Value());
-            const char* pText = pElem->GetText() ;
+            std::string pKey(vvvvvv_xml_name(pElem));
+            const char* pText = vvvvvv_xml_text(pElem) ;
 
             if (pKey == "summary")
             {
@@ -370,6 +347,7 @@ Game::Game(void):
 
 
         }
+        vvvvvv_xml_free(docTele);
     }
 
     //if (telecookie.data.savex == undefined) {
@@ -470,8 +448,8 @@ void Game::loadcustomlevelstats()
     //testing
     if(!customlevelstatsloaded)
     {
-        TiXmlDocument doc;
-        if (!FILESYSTEM_loadTiXmlDocument("saves/levelstats.vvv", &doc))
+        VVVVVV_XML_Document *doc = vvvvvv_xml_load("saves/levelstats.vvv");
+        if (!doc)
         {
             //No levelstats file exists; start new
             numcustomlevelstats=0;
@@ -479,27 +457,13 @@ void Game::loadcustomlevelstats()
         }
         else
         {
-            TiXmlHandle hDoc(&doc);
-            TiXmlElement* pElem;
-            TiXmlHandle hRoot(0);
+            VVVVVV_XML_Element *pElem;
+            VVVVVV_XML_Element *hRoot = vvvvvv_xml_root(doc);
 
+            for( pElem = vvvvvv_xml_first_child_element(vvvvvv_xml_first_child_element_named( hRoot, "Data" )); pElem; pElem=vvvvvv_xml_next_sibling_element(pElem))
             {
-                pElem=hDoc.FirstChildElement().Element();
-                // should always have a valid root but handle gracefully if it does
-                if (!pElem)
-                {
-                    printf("Error: Levelstats file corrupted\n");
-                }
-
-                // save this for later
-                hRoot=TiXmlHandle(pElem);
-            }
-
-
-            for( pElem = hRoot.FirstChild( "Data" ).FirstChild().Element(); pElem; pElem=pElem->NextSiblingElement())
-            {
-                std::string pKey(pElem->Value());
-                const char* pText = pElem->GetText() ;
+                std::string pKey(vvvvvv_xml_name(pElem));
+                const char* pText = vvvvvv_xml_text(pElem) ;
                 if(pText == NULL)
                 {
                     pText = "";
@@ -537,51 +501,45 @@ void Game::loadcustomlevelstats()
                     }
                 }
             }
+            vvvvvv_xml_free(doc);
         }
     }
 }
 
 void Game::savecustomlevelstats()
 {
-    TiXmlDocument doc;
-    TiXmlElement* msg;
-    TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" );
-    doc.LinkEndChild( decl );
+    VVVVVV_XML_Element* msg;
+    VVVVVV_XML_Element * root = vvvvvv_xml_new_element( "Levelstats" );
 
-    TiXmlElement * root = new TiXmlElement( "Levelstats" );
-    doc.LinkEndChild( root );
+    vvvvvv_xml_append_comment( root, " Levelstats Save file " );
 
-    TiXmlComment * comment = new TiXmlComment();
-    comment->SetValue(" Levelstats Save file " );
-    root->LinkEndChild( comment );
-
-    TiXmlElement * msgs = new TiXmlElement( "Data" );
-    root->LinkEndChild( msgs );
+    VVVVVV_XML_Element * msgs = vvvvvv_xml_new_element( "Data" );
+    vvvvvv_xml_append( root, msgs );
 
     if(numcustomlevelstats>=200)numcustomlevelstats=199;
-    msg = new TiXmlElement( "numcustomlevelstats" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(numcustomlevelstats).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "numcustomlevelstats" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(numcustomlevelstats).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
     std::string customlevelscorestr;
     for(int i = 0; i < numcustomlevelstats; i++ )
     {
         customlevelscorestr += UtilityClass::String(customlevelscore[i]) + ",";
     }
-    msg = new TiXmlElement( "customlevelscore" );
-    msg->LinkEndChild( new TiXmlText( customlevelscorestr.c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "customlevelscore" );
+    vvvvvv_xml_append_text( msg, customlevelscorestr.c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
     std::string customlevelstatsstr;
     for(int i = 0; i < numcustomlevelstats; i++ )
     {
         customlevelstatsstr += customlevelstats[i] + "|";
     }
-    msg = new TiXmlElement( "customlevelstats" );
-    msg->LinkEndChild( new TiXmlText( customlevelstatsstr.c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "customlevelstats" );
+    vvvvvv_xml_append_text( msg, customlevelstatsstr.c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    if(FILESYSTEM_saveTiXmlDocument("saves/levelstats.vvv", &doc))
+    if(vvvvvv_xml_save("saves/levelstats.vvv", root))
     {
         printf("Level stats saved\n");
     }
@@ -4104,270 +4062,258 @@ void Game::unlocknum( int t, mapclass& map, Graphics& dwgfx )
 
 void Game::loadstats( mapclass& map, Graphics& dwgfx )
 {
-    // TODO loadstats
-    TiXmlDocument doc;
-    if (!FILESYSTEM_loadTiXmlDocument("saves/unlock.vvv", &doc))
-    {
-        savestats(map, dwgfx);
-        printf("No Stats found. Assuming a new player\n");
-    }
-
-    TiXmlHandle hDoc(&doc);
-    TiXmlElement* pElem;
-    TiXmlHandle hRoot(0);
-
-
-    {
-        pElem=hDoc.FirstChildElement().Element();
-        // should always have a valid root but handle gracefully if it does
-        if (!pElem)
-        {
-
-        }
-        ;
-
-        // save this for later
-        hRoot=TiXmlHandle(pElem);
-    }
-
     // WINDOW DIMS, ADDED AT PATCH 22
     int width = 320;
     int height = 240;
 
-    for( pElem = hRoot.FirstChild( "Data" ).FirstChild().Element(); pElem; pElem=pElem->NextSiblingElement())
+    // TODO loadstats
+    VVVVVV_XML_Document *doc = vvvvvv_xml_load("saves/unlock.vvv");
+    if (!doc)
     {
-        std::string pKey(pElem->Value());
-        const char* pText = pElem->GetText() ;
+        savestats(map, dwgfx);
+        printf("No Stats found. Assuming a new player\n");
+    }
+    else
+    {
+        VVVVVV_XML_Element *pElem;
+        VVVVVV_XML_Element *hRoot = vvvvvv_xml_root(doc);
 
-        if (pKey == "unlock")
+        for( pElem = vvvvvv_xml_first_child_element(vvvvvv_xml_first_child_element_named( hRoot, "Data" )); pElem; pElem=vvvvvv_xml_next_sibling_element(pElem))
         {
-            std::string TextString = (pText);
-            if(TextString.length())
+            std::string pKey(vvvvvv_xml_name(pElem));
+            const char* pText = vvvvvv_xml_text(pElem) ;
+
+            if (pKey == "unlock")
             {
-                std::vector<std::string> values = split(TextString,',');
-                unlock.clear();
-                for(size_t i = 0; i < values.size(); i++)
+                std::string TextString = (pText);
+                if(TextString.length())
                 {
-                    unlock.push_back(atoi(values[i].c_str()));
+                    std::vector<std::string> values = split(TextString,',');
+                    unlock.clear();
+                    for(size_t i = 0; i < values.size(); i++)
+                    {
+                        unlock.push_back(atoi(values[i].c_str()));
+                    }
                 }
             }
-        }
 
-        if (pKey == "unlocknotify")
-        {
-            std::string TextString = (pText);
-            if(TextString.length())
+            if (pKey == "unlocknotify")
             {
-                std::vector<std::string> values = split(TextString,',');
-                unlocknotify.clear();
-                for(size_t i = 0; i < values.size(); i++)
+                std::string TextString = (pText);
+                if(TextString.length())
                 {
-                    unlocknotify.push_back(atoi(values[i].c_str()));
+                    std::vector<std::string> values = split(TextString,',');
+                    unlocknotify.clear();
+                    for(size_t i = 0; i < values.size(); i++)
+                    {
+                        unlocknotify.push_back(atoi(values[i].c_str()));
+                    }
                 }
             }
-        }
 
-        if (pKey == "besttimes")
-        {
-            std::string TextString = (pText);
-            if(TextString.length())
+            if (pKey == "besttimes")
             {
-                std::vector<std::string> values = split(TextString,',');
-                besttimes.clear();
-                for(size_t i = 0; i < values.size(); i++)
+                std::string TextString = (pText);
+                if(TextString.length())
                 {
-                    besttimes.push_back(atoi(values[i].c_str()));
+                    std::vector<std::string> values = split(TextString,',');
+                    besttimes.clear();
+                    for(size_t i = 0; i < values.size(); i++)
+                    {
+                        besttimes.push_back(atoi(values[i].c_str()));
+                    }
                 }
             }
-        }
 
-        if (pKey == "besttrinkets")
-        {
-            std::string TextString = (pText);
-            if(TextString.length())
+            if (pKey == "besttrinkets")
             {
-                std::vector<std::string> values = split(TextString,',');
-                besttrinkets.clear();
-                for(size_t i = 0; i < values.size(); i++)
+                std::string TextString = (pText);
+                if(TextString.length())
                 {
-                    besttrinkets.push_back(atoi(values[i].c_str()));
+                    std::vector<std::string> values = split(TextString,',');
+                    besttrinkets.clear();
+                    for(size_t i = 0; i < values.size(); i++)
+                    {
+                        besttrinkets.push_back(atoi(values[i].c_str()));
+                    }
                 }
             }
-        }
 
 
-        if (pKey == "bestlives")
-        {
-            std::string TextString = (pText);
-            if(TextString.length())
+            if (pKey == "bestlives")
             {
-                std::vector<std::string> values = split(TextString,',');
-                bestlives.clear();
-                for(size_t i = 0; i < values.size(); i++)
+                std::string TextString = (pText);
+                if(TextString.length())
                 {
-                    bestlives.push_back(atoi(values[i].c_str()));
+                    std::vector<std::string> values = split(TextString,',');
+                    bestlives.clear();
+                    for(size_t i = 0; i < values.size(); i++)
+                    {
+                        bestlives.push_back(atoi(values[i].c_str()));
+                    }
                 }
             }
-        }
 
 
-        if (pKey == "bestrank")
-        {
-            std::string TextString = (pText);
-            if(TextString.length())
+            if (pKey == "bestrank")
             {
-                std::vector<std::string> values = split(TextString,',');
-                bestrank.clear();
-                for(size_t i = 0; i < values.size(); i++)
+                std::string TextString = (pText);
+                if(TextString.length())
                 {
-                    bestrank.push_back(atoi(values[i].c_str()));
+                    std::vector<std::string> values = split(TextString,',');
+                    bestrank.clear();
+                    for(size_t i = 0; i < values.size(); i++)
+                    {
+                        bestrank.push_back(atoi(values[i].c_str()));
+                    }
                 }
             }
-        }
 
 
 
-        if (pKey == "bestgamedeaths")
-        {
-            bestgamedeaths = atoi(pText);
-        }
-
-        if (pKey == "stat_trinkets")
-        {
-            stat_trinkets = atoi(pText);
-        }
-
-        if (pKey == "fullscreen")
-        {
-            fullscreen = atoi(pText);
-        }
-
-	if (pKey == "stretch")
-	{
-		stretchMode = atoi(pText);
-	}
-
-	if (pKey == "useLinearFilter")
-	{
-		useLinearFilter = atoi(pText);
-	}
-
-	if (pKey == "window_width")
-	{
-		width = atoi(pText);
-	}
-	if (pKey == "window_height")
-	{
-		height = atoi(pText);
-	}
-
-
-        if (pKey == "noflashingmode")
-        {
-            noflashingmode = atoi(pText);
-        }
-
-        if (pKey == "colourblindmode")
-        {
-            colourblindmode = atoi(pText);
-        }
-
-        if (pKey == "setflipmode")
-        {
-            dwgfx.setflipmode = atoi(pText);
-        }
-
-        if (pKey == "invincibility")
-        {
-            map.invincibility = atoi(pText);
-        }
-
-        if (pKey == "slowdown")
-        {
-            slowdown = atoi(pText);
-            switch(slowdown)
+            if (pKey == "bestgamedeaths")
             {
-            case 30:
-                gameframerate=34;
-                break;
-            case 24:
-                gameframerate=41;
-                break;
-            case 18:
-                gameframerate=55;
-                break;
-            case 12:
-                gameframerate=83;
-                break;
-            default:
-                gameframerate=34;
-                break;
+                bestgamedeaths = atoi(pText);
             }
 
+            if (pKey == "stat_trinkets")
+            {
+                stat_trinkets = atoi(pText);
+            }
+
+            if (pKey == "fullscreen")
+            {
+                fullscreen = atoi(pText);
+            }
+
+            if (pKey == "stretch")
+            {
+                    stretchMode = atoi(pText);
+            }
+
+            if (pKey == "useLinearFilter")
+            {
+                    useLinearFilter = atoi(pText);
+            }
+
+            if (pKey == "window_width")
+            {
+                    width = atoi(pText);
+            }
+            if (pKey == "window_height")
+            {
+                    height = atoi(pText);
+            }
+
+
+            if (pKey == "noflashingmode")
+            {
+                noflashingmode = atoi(pText);
+            }
+
+            if (pKey == "colourblindmode")
+            {
+                colourblindmode = atoi(pText);
+            }
+
+            if (pKey == "setflipmode")
+            {
+                dwgfx.setflipmode = atoi(pText);
+            }
+
+            if (pKey == "invincibility")
+            {
+                map.invincibility = atoi(pText);
+            }
+
+            if (pKey == "slowdown")
+            {
+                slowdown = atoi(pText);
+                switch(slowdown)
+                {
+                case 30:
+                    gameframerate=34;
+                    break;
+                case 24:
+                    gameframerate=41;
+                    break;
+                case 18:
+                    gameframerate=55;
+                    break;
+                case 12:
+                    gameframerate=83;
+                    break;
+                default:
+                    gameframerate=34;
+                    break;
+                }
+
+            }
+
+            if (pKey == "swnbestrank")
+            {
+                swnbestrank = atoi(pText);
+            }
+
+            if (pKey == "swnrecord")
+            {
+                swnrecord = atoi(pText);
+            }
+
+            if (pKey == "advanced_mode")
+            {
+                advanced_mode = atoi(pText);
+            }
+
+            if (pKey == "advanced_smoothing")
+            {
+                fullScreenEffect_badSignal = atoi(pText);
+                dwgfx.screenbuffer->badSignalEffect = fullScreenEffect_badSignal;
+            }
+
+                                    if (pKey == "usingmmmmmm")
+            {
+                                            if(atoi(pText)>0){
+                usingmmmmmm = 1;
+                                            }else{
+                                              usingmmmmmm = 0;
+                                            }
+            }
+
+                    if (pKey == "flipButton")
+                    {
+                            SDL_GameControllerButton newButton;
+                            if (GetButtonFromString(pText, &newButton))
+                            {
+                                    controllerButton_flip.push_back(newButton);
+                            }
+                    }
+
+                    if (pKey == "enterButton")
+                    {
+                            SDL_GameControllerButton newButton;
+                            if (GetButtonFromString(pText, &newButton))
+                            {
+                                    controllerButton_map.push_back(newButton);
+                            }
+                    }
+
+                    if (pKey == "escButton")
+                    {
+                            SDL_GameControllerButton newButton;
+                            if (GetButtonFromString(pText, &newButton))
+                            {
+                                    controllerButton_esc.push_back(newButton);
+                            }
+                    }
+
+                    if (pKey == "controllerSensitivity")
+                    {
+                            controllerSensitivity = atoi(pText);
+                    }
+
         }
-
-        if (pKey == "swnbestrank")
-        {
-            swnbestrank = atoi(pText);
-        }
-
-        if (pKey == "swnrecord")
-        {
-            swnrecord = atoi(pText);
-        }
-
-        if (pKey == "advanced_mode")
-        {
-            advanced_mode = atoi(pText);
-        }
-
-        if (pKey == "advanced_smoothing")
-        {
-            fullScreenEffect_badSignal = atoi(pText);
-            dwgfx.screenbuffer->badSignalEffect = fullScreenEffect_badSignal;
-        }
-
-				if (pKey == "usingmmmmmm")
-        {
-					if(atoi(pText)>0){
-            usingmmmmmm = 1;
-					}else{
-					  usingmmmmmm = 0;
-					}
-        }
-
-		if (pKey == "flipButton")
-		{
-			SDL_GameControllerButton newButton;
-			if (GetButtonFromString(pText, &newButton))
-			{
-				controllerButton_flip.push_back(newButton);
-			}
-		}
-
-		if (pKey == "enterButton")
-		{
-			SDL_GameControllerButton newButton;
-			if (GetButtonFromString(pText, &newButton))
-			{
-				controllerButton_map.push_back(newButton);
-			}
-		}
-
-		if (pKey == "escButton")
-		{
-			SDL_GameControllerButton newButton;
-			if (GetButtonFromString(pText, &newButton))
-			{
-				controllerButton_esc.push_back(newButton);
-			}
-		}
-
-		if (pKey == "controllerSensitivity")
-		{
-			controllerSensitivity = atoi(pText);
-		}
-
+        vvvvvv_xml_free(doc);
     }
 
     if(fullscreen)
@@ -4400,171 +4346,165 @@ void Game::loadstats( mapclass& map, Graphics& dwgfx )
 
 void Game::savestats( mapclass& _map, Graphics& _dwgfx )
 {
-    TiXmlDocument doc;
-    TiXmlElement* msg;
-    TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" );
-    doc.LinkEndChild( decl );
+    VVVVVV_XML_Element* msg;
 
-    TiXmlElement * root = new TiXmlElement( "Save" );
-    doc.LinkEndChild( root );
+    VVVVVV_XML_Element * root = vvvvvv_xml_new_element( "Save" );
 
-    TiXmlComment * comment = new TiXmlComment();
-    comment->SetValue(" Save file " );
-    root->LinkEndChild( comment );
+    vvvvvv_xml_append_comment( root, " Save file " );
 
-    TiXmlElement * dataNode = new TiXmlElement( "Data" );
-    root->LinkEndChild( dataNode );
+    VVVVVV_XML_Element * dataNode = vvvvvv_xml_new_element( "Data" );
+    vvvvvv_xml_append( root, dataNode );
 
     std::string s_unlock;
     for(size_t i = 0; i < unlock.size(); i++ )
     {
         s_unlock += UtilityClass::String(unlock[i]) + ",";
     }
-    msg = new TiXmlElement( "unlock" );
-    msg->LinkEndChild( new TiXmlText( s_unlock.c_str() ));
-    dataNode->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "unlock" );
+    vvvvvv_xml_append_text( msg, s_unlock.c_str() );
+    vvvvvv_xml_append( dataNode, msg );
 
     std::string s_unlocknotify;
     for(size_t i = 0; i < unlocknotify.size(); i++ )
     {
         s_unlocknotify += UtilityClass::String(unlocknotify[i]) + ",";
     }
-    msg = new TiXmlElement( "unlocknotify" );
-    msg->LinkEndChild( new TiXmlText( s_unlocknotify.c_str() ));
-    dataNode->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "unlocknotify" );
+    vvvvvv_xml_append_text( msg, s_unlocknotify.c_str() );
+    vvvvvv_xml_append( dataNode, msg );
 
     std::string s_besttimes;
     for(size_t i = 0; i < besttrinkets.size(); i++ )
     {
         s_besttimes += UtilityClass::String(besttimes[i]) + ",";
     }
-    msg = new TiXmlElement( "besttimes" );
-    msg->LinkEndChild( new TiXmlText( s_besttimes.c_str() ));
-    dataNode->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "besttimes" );
+    vvvvvv_xml_append_text( msg, s_besttimes.c_str() );
+    vvvvvv_xml_append( dataNode, msg );
 
     std::string s_besttrinkets;
     for(size_t i = 0; i < besttrinkets.size(); i++ )
     {
         s_besttrinkets += UtilityClass::String(besttrinkets[i]) + ",";
     }
-    msg = new TiXmlElement( "besttrinkets" );
-    msg->LinkEndChild( new TiXmlText( s_besttrinkets.c_str() ));
-    dataNode->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "besttrinkets" );
+    vvvvvv_xml_append_text( msg, s_besttrinkets.c_str() );
+    vvvvvv_xml_append( dataNode, msg );
 
     std::string s_bestlives;
     for(size_t i = 0; i < bestlives.size(); i++ )
     {
         s_bestlives += UtilityClass::String(bestlives[i]) + ",";
     }
-    msg = new TiXmlElement( "bestlives" );
-    msg->LinkEndChild( new TiXmlText( s_bestlives.c_str() ));
-    dataNode->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "bestlives" );
+    vvvvvv_xml_append_text( msg, s_bestlives.c_str() );
+    vvvvvv_xml_append( dataNode, msg );
 
     std::string s_bestrank;
     for(size_t i = 0; i < bestrank.size(); i++ )
     {
         s_bestrank += UtilityClass::String(bestrank[i]) + ",";
     }
-    msg = new TiXmlElement( "bestrank" );
-    msg->LinkEndChild( new TiXmlText( s_bestrank.c_str() ));
-    dataNode->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "bestrank" );
+    vvvvvv_xml_append_text( msg, s_bestrank.c_str() );
+    vvvvvv_xml_append( dataNode, msg );
 
     //for itoa ops
     UtilityClass tu;
-    msg = new TiXmlElement( "bestgamedeaths" );
-    msg->LinkEndChild( new TiXmlText( tu.String(bestgamedeaths).c_str() ));
-    dataNode->LinkEndChild( msg );
-    msg = new TiXmlElement( "stat_trinkets" );
-    msg->LinkEndChild( new TiXmlText( tu.String(stat_trinkets).c_str()));
-    dataNode->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "bestgamedeaths" );
+    vvvvvv_xml_append_text( msg, tu.String(bestgamedeaths).c_str() );
+    vvvvvv_xml_append( dataNode, msg );
+    msg = vvvvvv_xml_new_element( "stat_trinkets" );
+    vvvvvv_xml_append_text( msg, tu.String(stat_trinkets).c_str());
+    vvvvvv_xml_append( dataNode, msg );
 
-    msg = new TiXmlElement( "fullscreen" );
-    msg->LinkEndChild( new TiXmlText( tu.String(fullscreen).c_str()));
-    dataNode->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "fullscreen" );
+    vvvvvv_xml_append_text( msg, tu.String(fullscreen).c_str());
+    vvvvvv_xml_append( dataNode, msg );
 
-    msg = new TiXmlElement( "stretch" );
-    msg->LinkEndChild( new TiXmlText( tu.String(stretchMode).c_str()));
-    dataNode->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "stretch" );
+    vvvvvv_xml_append_text( msg, tu.String(stretchMode).c_str());
+    vvvvvv_xml_append( dataNode, msg );
 
-    msg = new TiXmlElement( "useLinearFilter" );
-    msg->LinkEndChild( new TiXmlText( tu.String(useLinearFilter).c_str()));
-    dataNode->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "useLinearFilter" );
+    vvvvvv_xml_append_text( msg, tu.String(useLinearFilter).c_str());
+    vvvvvv_xml_append( dataNode, msg );
 
     int width, height;
     _dwgfx.screenbuffer->GetWindowSize(&width, &height);
-    msg = new TiXmlElement( "window_width" );
-    msg->LinkEndChild( new TiXmlText( tu.String(width).c_str()));
-    dataNode->LinkEndChild( msg );
-    msg = new TiXmlElement( "window_height" );
-    msg->LinkEndChild( new TiXmlText( tu.String(height).c_str()));
-    dataNode->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "window_width" );
+    vvvvvv_xml_append_text( msg, tu.String(width).c_str());
+    vvvvvv_xml_append( dataNode, msg );
+    msg = vvvvvv_xml_new_element( "window_height" );
+    vvvvvv_xml_append_text( msg, tu.String(height).c_str());
+    vvvvvv_xml_append( dataNode, msg );
 
-    msg = new TiXmlElement( "noflashingmode" );
-    msg->LinkEndChild( new TiXmlText( tu.String(noflashingmode).c_str()));
-    dataNode->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "noflashingmode" );
+    vvvvvv_xml_append_text( msg, tu.String(noflashingmode).c_str());
+    vvvvvv_xml_append( dataNode, msg );
 
-    msg = new TiXmlElement( "colourblindmode" );
-    msg->LinkEndChild( new TiXmlText( tu.String(colourblindmode).c_str()));
-    dataNode->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "colourblindmode" );
+    vvvvvv_xml_append_text( msg, tu.String(colourblindmode).c_str());
+    vvvvvv_xml_append( dataNode, msg );
 
-    msg = new TiXmlElement( "setflipmode" );
-    msg->LinkEndChild( new TiXmlText( tu.String(_dwgfx.setflipmode).c_str()));
-    dataNode->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "setflipmode" );
+    vvvvvv_xml_append_text( msg, tu.String(_dwgfx.setflipmode).c_str());
+    vvvvvv_xml_append( dataNode, msg );
 
-    msg = new TiXmlElement( "invincibility" );
-    msg->LinkEndChild( new TiXmlText( tu.String(_map.invincibility).c_str()));
-    dataNode->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "invincibility" );
+    vvvvvv_xml_append_text( msg, tu.String(_map.invincibility).c_str());
+    vvvvvv_xml_append( dataNode, msg );
 
-    msg = new TiXmlElement( "slowdown" );
-    msg->LinkEndChild( new TiXmlText( tu.String(slowdown).c_str()));
-    dataNode->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "slowdown" );
+    vvvvvv_xml_append_text( msg, tu.String(slowdown).c_str());
+    vvvvvv_xml_append( dataNode, msg );
 
-    msg = new TiXmlElement( "swnbestrank" );
-    msg->LinkEndChild( new TiXmlText( tu.String(swnbestrank).c_str()));
-    dataNode->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "swnbestrank" );
+    vvvvvv_xml_append_text( msg, tu.String(swnbestrank).c_str());
+    vvvvvv_xml_append( dataNode, msg );
 
-    msg = new TiXmlElement( "swnrecord" );
-    msg->LinkEndChild( new TiXmlText( tu.String(swnrecord).c_str()));
-    dataNode->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "swnrecord" );
+    vvvvvv_xml_append_text( msg, tu.String(swnrecord).c_str());
+    vvvvvv_xml_append( dataNode, msg );
 
 
-    msg = new TiXmlElement( "advanced_mode" );
-    msg->LinkEndChild( new TiXmlText( tu.String(advanced_mode).c_str()));
-    dataNode->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "advanced_mode" );
+    vvvvvv_xml_append_text( msg, tu.String(advanced_mode).c_str());
+    vvvvvv_xml_append( dataNode, msg );
 
-    msg = new TiXmlElement( "advanced_smoothing" );
-    msg->LinkEndChild( new TiXmlText( tu.String(fullScreenEffect_badSignal).c_str()));
-    dataNode->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "advanced_smoothing" );
+    vvvvvv_xml_append_text( msg, tu.String(fullScreenEffect_badSignal).c_str());
+    vvvvvv_xml_append( dataNode, msg );
 
 		
-    msg = new TiXmlElement( "usingmmmmmm" );
-    msg->LinkEndChild( new TiXmlText( tu.String(usingmmmmmm).c_str()));
-    dataNode->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "usingmmmmmm" );
+    vvvvvv_xml_append_text( msg, tu.String(usingmmmmmm).c_str());
+    vvvvvv_xml_append( dataNode, msg );
 
     for (size_t i = 0; i < controllerButton_flip.size(); i += 1)
     {
-        msg = new TiXmlElement("flipButton");
-        msg->LinkEndChild(new TiXmlText(tu.String((int) controllerButton_flip[i]).c_str()));
-        dataNode->LinkEndChild(msg);
+        msg = vvvvvv_xml_new_element("flipButton");
+        vvvvvv_xml_append_text(msg, tu.String((int) controllerButton_flip[i]).c_str());
+        vvvvvv_xml_append( dataNode,msg);
     }
     for (size_t i = 0; i < controllerButton_map.size(); i += 1)
     {
-        msg = new TiXmlElement("enterButton");
-        msg->LinkEndChild(new TiXmlText(tu.String((int) controllerButton_map[i]).c_str()));
-        dataNode->LinkEndChild(msg);
+        msg = vvvvvv_xml_new_element("enterButton");
+        vvvvvv_xml_append_text(msg, tu.String((int) controllerButton_map[i]).c_str());
+        vvvvvv_xml_append( dataNode,msg);
     }
     for (size_t i = 0; i < controllerButton_esc.size(); i += 1)
     {
-        msg = new TiXmlElement("escButton");
-        msg->LinkEndChild(new TiXmlText(tu.String((int) controllerButton_esc[i]).c_str()));
-        dataNode->LinkEndChild(msg);
+        msg = vvvvvv_xml_new_element("escButton");
+        vvvvvv_xml_append_text(msg, tu.String((int) controllerButton_esc[i]).c_str());
+        vvvvvv_xml_append( dataNode,msg);
     }
 
-	msg = new TiXmlElement( "controllerSensitivity" );
-	msg->LinkEndChild( new TiXmlText( tu.String(controllerSensitivity).c_str()));
-	dataNode->LinkEndChild( msg );
+	msg = vvvvvv_xml_new_element( "controllerSensitivity" );
+	vvvvvv_xml_append_text( msg, tu.String(controllerSensitivity).c_str());
+	vvvvvv_xml_append( dataNode, msg );
 
-    FILESYSTEM_saveTiXmlDocument("saves/unlock.vvv", &doc);
+    vvvvvv_xml_save("saves/unlock.vvv", root);
 }
 
 void Game::customstart( entityclass& obj, musicclass& music )
@@ -4792,30 +4732,16 @@ void Game::starttrial( int t, entityclass& obj, musicclass& music )
 
 void Game::loadquick( mapclass& map, entityclass& obj, musicclass& music )
 {
-    TiXmlDocument doc;
-    if (!FILESYSTEM_loadTiXmlDocument("saves/qsave.vvv", &doc)) return;
+    VVVVVV_XML_Document *doc = vvvvvv_xml_load("saves/qsave.vvv");
+    if (!doc) return;
 
-    TiXmlHandle hDoc(&doc);
-    TiXmlElement* pElem;
-    TiXmlHandle hRoot(0);
+    VVVVVV_XML_Element *pElem;
+    VVVVVV_XML_Element *hRoot = vvvvvv_xml_root(doc);
 
-
+    for( pElem = vvvvvv_xml_first_child_element(vvvvvv_xml_first_child_element_named( hRoot, "Data" )); pElem; pElem=vvvvvv_xml_next_sibling_element(pElem))
     {
-        pElem=hDoc.FirstChildElement().Element();
-        // should always have a valid root but handle gracefully if it does
-        if (!pElem)
-        {
-            printf("Save Not Found\n");
-        }
-
-        // save this for later
-        hRoot=TiXmlHandle(pElem);
-    }
-
-    for( pElem = hRoot.FirstChild( "Data" ).FirstChild().Element(); pElem; pElem=pElem->NextSiblingElement())
-    {
-        std::string pKey(pElem->Value());
-        const char* pText = pElem->GetText() ;
+        std::string pKey(vvvvvv_xml_name(pElem));
+        const char* pText = vvvvvv_xml_text(pElem) ;
         if(pText == NULL)
         {
             pText = "";
@@ -4989,6 +4915,7 @@ void Game::loadquick( mapclass& map, entityclass& obj, musicclass& music )
         }
 
     }
+    vvvvvv_xml_free(doc);
 
     if (map.finalmode)
     {
@@ -5014,30 +4941,16 @@ void Game::loadquick( mapclass& map, entityclass& obj, musicclass& music )
 void Game::customloadquick(std::string savfile, mapclass& map, entityclass& obj, musicclass& music )
 {
     std::string levelfile = savfile.substr(7);
-    TiXmlDocument doc;
-    if (!FILESYSTEM_loadTiXmlDocument(("saves/"+levelfile+".vvv").c_str(), &doc)) return;
+    VVVVVV_XML_Document *doc = vvvvvv_xml_load(("saves/"+levelfile+".vvv").c_str());
+    if (!doc) return;
 
-    TiXmlHandle hDoc(&doc);
-    TiXmlElement* pElem;
-    TiXmlHandle hRoot(0);
+    VVVVVV_XML_Element *pElem;
+    VVVVVV_XML_Element *hRoot = vvvvvv_xml_root(doc);
 
-
+    for( pElem = vvvvvv_xml_first_child_element(vvvvvv_xml_first_child_element_named( hRoot, "Data" )); pElem; pElem=vvvvvv_xml_next_sibling_element(pElem))
     {
-        pElem=hDoc.FirstChildElement().Element();
-        // should always have a valid root but handle gracefully if it does
-        if (!pElem)
-        {
-            printf("Save Not Found\n");
-        }
-
-        // save this for later
-        hRoot=TiXmlHandle(pElem);
-    }
-
-    for( pElem = hRoot.FirstChild( "Data" ).FirstChild().Element(); pElem; pElem=pElem->NextSiblingElement())
-    {
-        std::string pKey(pElem->Value());
-        const char* pText = pElem->GetText() ;
+        std::string pKey(vvvvvv_xml_name(pElem));
+        const char* pText = vvvvvv_xml_text(pElem) ;
         if(pText == NULL)
         {
             pText = "";
@@ -5261,6 +5174,7 @@ void Game::customloadquick(std::string savfile, mapclass& map, entityclass& obj,
         }
 
     }
+    vvvvvv_xml_free(doc);
 
     map.showteleporters = true;
     if(obj.flags[12]==1) map.showtargets = true;
@@ -5298,8 +5212,8 @@ void Game::loadsummary( mapclass& map, UtilityClass& help )
     //	quick_crewstats = summary_crewstats.slice();
     //}
 
-    TiXmlDocument docTele;
-    if (!FILESYSTEM_loadTiXmlDocument("saves/tsave.vvv", &docTele))
+    VVVVVV_XML_Document *docTele = vvvvvv_xml_load("saves/tsave.vvv");
+    if (!docTele)
     {
         telecookieexists = false;
         telesummary = "";
@@ -5307,30 +5221,16 @@ void Game::loadsummary( mapclass& map, UtilityClass& help )
     else
     {
         telecookieexists = true;
-        TiXmlHandle hDoc(&docTele);
-        TiXmlElement* pElem;
-        TiXmlHandle hRoot(0);
-
-
-        {
-            pElem=hDoc.FirstChildElement().Element();
-            // should always have a valid root but handle gracefully if it does
-            if (!pElem)
-            {
-                printf("Save Not Found\n");
-            }
-
-            // save this for later
-            hRoot=TiXmlHandle(pElem);
-        }
+        VVVVVV_XML_Element *pElem;
+        VVVVVV_XML_Element *hRoot = vvvvvv_xml_root(docTele);
         int l_minute, l_second, l_hours;
         l_minute = l_second= l_hours = 0;
         int l_saveX = 0;
         int l_saveY = 0;
-        for( pElem = hRoot.FirstChild( "Data" ).FirstChild().Element(); pElem; pElem=pElem->NextSiblingElement())
+        for( pElem = vvvvvv_xml_first_child_element(vvvvvv_xml_first_child_element_named( hRoot, "Data" )); pElem; pElem=vvvvvv_xml_next_sibling_element(pElem))
         {
-            std::string pKey(pElem->Value());
-            const char* pText = pElem->GetText() ;
+            std::string pKey(vvvvvv_xml_name(pElem));
+            const char* pText = vvvvvv_xml_text(pElem) ;
 
             if (pKey == "summary")
             {
@@ -5387,10 +5287,11 @@ void Game::loadsummary( mapclass& map, UtilityClass& help )
         }
         tele_gametime = giventimestring(l_hours,l_minute, l_second,help);
         tele_currentarea = map.currentarea(map.area(l_saveX, l_saveY));
+        vvvvvv_xml_free(docTele);
     }
 
-    TiXmlDocument doc;
-    if (!FILESYSTEM_loadTiXmlDocument("saves/qsave.vvv", &doc))
+    VVVVVV_XML_Document *doc = vvvvvv_xml_load("saves/qsave.vvv");
+    if (!doc)
     {
         quickcookieexists = false;
         quicksummary = "";
@@ -5398,30 +5299,16 @@ void Game::loadsummary( mapclass& map, UtilityClass& help )
     else
     {
         quickcookieexists = true;
-        TiXmlHandle hDoc(&doc);
-        TiXmlElement* pElem;
-        TiXmlHandle hRoot(0);
-
-
-        {
-            pElem=hDoc.FirstChildElement().Element();
-            // should always have a valid root but handle gracefully if it does
-            if (!pElem)
-            {
-                printf("Save Not Found\n");
-            }
-
-            // save this for later
-            hRoot=TiXmlHandle(pElem);
-        }
+        VVVVVV_XML_Element *pElem;
+        VVVVVV_XML_Element *hRoot = vvvvvv_xml_root(doc);
         int l_minute, l_second, l_hours;
         l_minute = l_second= l_hours = 0;
         int l_saveX = 0;
         int l_saveY = 0;
-        for( pElem = hRoot.FirstChild( "Data" ).FirstChild().Element(); pElem; pElem=pElem->NextSiblingElement())
+        for( pElem = vvvvvv_xml_first_child_element(vvvvvv_xml_first_child_element_named( hRoot, "Data" )); pElem; pElem=vvvvvv_xml_next_sibling_element(pElem))
         {
-            std::string pKey(pElem->Value());
-            const char* pText = pElem->GetText() ;
+            std::string pKey(vvvvvv_xml_name(pElem));
+            const char* pText = vvvvvv_xml_text(pElem) ;
 
             if (pKey == "summary")
             {
@@ -5479,6 +5366,7 @@ void Game::loadsummary( mapclass& map, UtilityClass& help )
 
         quick_gametime = giventimestring(l_hours,l_minute, l_second,help);
         quick_currentarea = map.currentarea(map.area(l_saveX, l_saveY));
+        vvvvvv_xml_free(doc);
     }
 
 
@@ -5507,20 +5395,14 @@ void Game::savetele( mapclass& map, entityclass& obj, musicclass& music )
     //Save to the telesave cookie
     telecookieexists = true;
 
-    TiXmlDocument doc;
-    TiXmlElement* msg;
-    TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" );
-    doc.LinkEndChild( decl );
+    VVVVVV_XML_Element* msg;
 
-    TiXmlElement * root = new TiXmlElement( "Save" );
-    doc.LinkEndChild( root );
+    VVVVVV_XML_Element * root = vvvvvv_xml_new_element( "Save" );
 
-    TiXmlComment * comment = new TiXmlComment();
-    comment->SetValue(" Save file " );
-    root->LinkEndChild( comment );
+    vvvvvv_xml_append_comment( root, " Save file " );
 
-    TiXmlElement * msgs = new TiXmlElement( "Data" );
-    root->LinkEndChild( msgs );
+    VVVVVV_XML_Element * msgs = vvvvvv_xml_new_element( "Data" );
+    vvvvvv_xml_append( root, msgs );
 
 
     //Flags, map and stats
@@ -5542,36 +5424,36 @@ void Game::savetele( mapclass& map, entityclass& obj, musicclass& music )
     {
         mapExplored += UtilityClass::String(map.explored[i]) + ",";
     }
-    msg = new TiXmlElement( "worldmap" );
-    msg->LinkEndChild( new TiXmlText( mapExplored.c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "worldmap" );
+    vvvvvv_xml_append_text( msg, mapExplored.c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
     std::string flags;
     for(size_t i = 0; i < obj.flags.size(); i++ )
     {
         flags += UtilityClass::String(obj.flags[i]) + ",";
     }
-    msg = new TiXmlElement( "flags" );
-    msg->LinkEndChild( new TiXmlText( flags.c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "flags" );
+    vvvvvv_xml_append_text( msg, flags.c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
     std::string crewstatsString;
     for(size_t i = 0; i < crewstats.size(); i++ )
     {
         crewstatsString += UtilityClass::String(crewstats[i]) + ",";
     }
-    msg = new TiXmlElement( "crewstats" );
-    msg->LinkEndChild( new TiXmlText( crewstatsString.c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "crewstats" );
+    vvvvvv_xml_append_text( msg, crewstatsString.c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
     std::string collect;
     for(size_t i = 0; i < obj.collect.size(); i++ )
     {
         collect += UtilityClass::String(obj.collect[i]) + ",";
     }
-    msg = new TiXmlElement( "collect" );
-    msg->LinkEndChild( new TiXmlText( collect.c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "collect" );
+    vvvvvv_xml_append_text( msg, collect.c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
     //telecookie.data.finalx = map.finalx;
     //telecookie.data.finaly = map.finaly;
@@ -5579,29 +5461,29 @@ void Game::savetele( mapclass& map, entityclass& obj, musicclass& music )
     //telecookie.data.savex = savex;
     //telecookie.data.savey = savey;
 
-    msg = new TiXmlElement( "finalx" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(map.finalx).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "finalx" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(map.finalx).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "finaly" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(map.finaly).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "finaly" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(map.finaly).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "savex" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(savex).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "savex" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(savex).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "savey" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(savey).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "savey" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(savey).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "saverx" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(saverx).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "saverx" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(saverx).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "savery" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(savery).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "savery" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(savery).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
     //telecookie.data.saverx = saverx;
     //telecookie.data.savery = savery;
@@ -5610,21 +5492,21 @@ void Game::savetele( mapclass& map, entityclass& obj, musicclass& music )
     //telecookie.data.savepoint = savepoint;
     //telecookie.data.trinkets = trinkets;
 
-    msg = new TiXmlElement( "savegc" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(savegc).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "savegc" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(savegc).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "savedir" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(savedir).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "savedir" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(savedir).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "savepoint" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(savepoint).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "savepoint" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(savepoint).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "trinkets" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(trinkets).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "trinkets" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(trinkets).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
 
     //if (music.nicechange != -1) {
@@ -5643,37 +5525,37 @@ void Game::savetele( mapclass& map, entityclass& obj, musicclass& music )
 
     if(music.nicefade==1)
     {
-        msg = new TiXmlElement( "currentsong" );
-        msg->LinkEndChild( new TiXmlText( UtilityClass::String(music.nicechange).c_str() ));
-        msgs->LinkEndChild( msg );
+        msg = vvvvvv_xml_new_element( "currentsong" );
+        vvvvvv_xml_append_text( msg, UtilityClass::String(music.nicechange).c_str() );
+        vvvvvv_xml_append( msgs, msg );
     }
     else
     {
-        msg = new TiXmlElement( "currentsong" );
-        msg->LinkEndChild( new TiXmlText( UtilityClass::String(music.currentsong).c_str() ));
-        msgs->LinkEndChild( msg );
+        msg = vvvvvv_xml_new_element( "currentsong" );
+        vvvvvv_xml_append_text( msg, UtilityClass::String(music.currentsong).c_str() );
+        vvvvvv_xml_append( msgs, msg );
     }
 
-    msg = new TiXmlElement( "teleportscript" );
-    msg->LinkEndChild( new TiXmlText( teleportscript.c_str() ));
-    msgs->LinkEndChild( msg );
-    msg = new TiXmlElement( "companion" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(companion).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "teleportscript" );
+    vvvvvv_xml_append_text( msg, teleportscript.c_str() );
+    vvvvvv_xml_append( msgs, msg );
+    msg = vvvvvv_xml_new_element( "companion" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(companion).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "lastsaved" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(lastsaved).c_str() ));
-    msgs->LinkEndChild( msg );
-    msg = new TiXmlElement( "supercrewmate" );
-    msg->LinkEndChild( new TiXmlText( BoolToString(supercrewmate) ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "lastsaved" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(lastsaved).c_str() );
+    vvvvvv_xml_append( msgs, msg );
+    msg = vvvvvv_xml_new_element( "supercrewmate" );
+    vvvvvv_xml_append_text( msg, BoolToString(supercrewmate) );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "scmprogress" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(scmprogress).c_str() ));
-    msgs->LinkEndChild( msg );
-    msg = new TiXmlElement( "scmmoveme" );
-    msg->LinkEndChild( new TiXmlText( BoolToString(scmmoveme) ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "scmprogress" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(scmprogress).c_str() );
+    vvvvvv_xml_append( msgs, msg );
+    msg = vvvvvv_xml_new_element( "scmmoveme" );
+    vvvvvv_xml_append_text( msg, BoolToString(scmmoveme) );
+    vvvvvv_xml_append( msgs, msg );
 
 
     //telecookie.data.frames = frames; telecookie.data.seconds = seconds;
@@ -5688,53 +5570,53 @@ void Game::savetele( mapclass& map, entityclass& obj, musicclass& music )
     //telesummary = telecookie.data.summary;
 
 
-    msg = new TiXmlElement( "frames" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(frames).c_str() ));
-    msgs->LinkEndChild( msg );
-    msg = new TiXmlElement( "seconds" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(seconds).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "frames" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(frames).c_str() );
+    vvvvvv_xml_append( msgs, msg );
+    msg = vvvvvv_xml_new_element( "seconds" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(seconds).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "minutes" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(minutes).c_str()) );
-    msgs->LinkEndChild( msg );
-    msg = new TiXmlElement( "hours" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(hours).c_str()) );
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "minutes" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(minutes).c_str() );
+    vvvvvv_xml_append( msgs, msg );
+    msg = vvvvvv_xml_new_element( "hours" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(hours).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "deathcounts" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(deathcounts).c_str() ));
-    msgs->LinkEndChild( msg );
-    msg = new TiXmlElement( "totalflips" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(totalflips).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "deathcounts" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(deathcounts).c_str() );
+    vvvvvv_xml_append( msgs, msg );
+    msg = vvvvvv_xml_new_element( "totalflips" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(totalflips).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "hardestroom" );
-    msg->LinkEndChild( new TiXmlText( hardestroom.c_str() ));
-    msgs->LinkEndChild( msg );
-    msg = new TiXmlElement( "hardestroomdeaths" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(hardestroomdeaths).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "hardestroom" );
+    vvvvvv_xml_append_text( msg, hardestroom.c_str() );
+    vvvvvv_xml_append( msgs, msg );
+    msg = vvvvvv_xml_new_element( "hardestroomdeaths" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(hardestroomdeaths).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "finalmode" );
-    msg->LinkEndChild( new TiXmlText( BoolToString(map.finalmode)));
-    msgs->LinkEndChild( msg );
-    msg = new TiXmlElement( "finalstretch" );
-    msg->LinkEndChild( new TiXmlText( BoolToString(map.finalstretch) ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "finalmode" );
+    vvvvvv_xml_append_text( msg, BoolToString(map.finalmode));
+    vvvvvv_xml_append( msgs, msg );
+    msg = vvvvvv_xml_new_element( "finalstretch" );
+    vvvvvv_xml_append_text( msg, BoolToString(map.finalstretch) );
+    vvvvvv_xml_append( msgs, msg );
 
 
-    msg = new TiXmlElement( "summary" );
+    msg = vvvvvv_xml_new_element( "summary" );
     UtilityClass tempUtil;
     std::string summary = savearea + ", " + timestring(tempUtil);
-    msg->LinkEndChild( new TiXmlText( summary.c_str() ));
-    msgs->LinkEndChild( msg );
+    vvvvvv_xml_append_text( msg, summary.c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
     telesummary = summary;
     //telecookie.flush();
     //telecookie.close();
 
-    if(FILESYSTEM_saveTiXmlDocument("saves/tsave.vvv", &doc))
+    if(vvvvvv_xml_save("saves/tsave.vvv", root))
     {
         printf("Game saved\n");
     }
@@ -5750,20 +5632,13 @@ void Game::savequick( mapclass& map, entityclass& obj, musicclass& music )
 {
     quickcookieexists = true;
 
-    TiXmlDocument doc;
-    TiXmlElement* msg;
-    TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" );
-    doc.LinkEndChild( decl );
+    VVVVVV_XML_Element* msg;
+    VVVVVV_XML_Element * root = vvvvvv_xml_new_element( "Save" );
 
-    TiXmlElement * root = new TiXmlElement( "Save" );
-    doc.LinkEndChild( root );
+    vvvvvv_xml_append_comment( root, " Save file " );
 
-    TiXmlComment * comment = new TiXmlComment();
-    comment->SetValue(" Save file " );
-    root->LinkEndChild( comment );
-
-    TiXmlElement * msgs = new TiXmlElement( "Data" );
-    root->LinkEndChild( msgs );
+    VVVVVV_XML_Element * msgs = vvvvvv_xml_new_element( "Data" );
+    vvvvvv_xml_append( root, msgs );
 
 
     //Flags, map and stats
@@ -5785,36 +5660,36 @@ void Game::savequick( mapclass& map, entityclass& obj, musicclass& music )
     {
         mapExplored += UtilityClass::String(map.explored[i]) + ",";
     }
-    msg = new TiXmlElement( "worldmap" );
-    msg->LinkEndChild( new TiXmlText( mapExplored.c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "worldmap" );
+    vvvvvv_xml_append_text( msg, mapExplored.c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
     std::string flags;
     for(size_t i = 0; i < obj.flags.size(); i++ )
     {
         flags += UtilityClass::String(obj.flags[i]) + ",";
     }
-    msg = new TiXmlElement( "flags" );
-    msg->LinkEndChild( new TiXmlText( flags.c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "flags" );
+    vvvvvv_xml_append_text( msg, flags.c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
     std::string crewstatsString;
     for(size_t i = 0; i < crewstats.size(); i++ )
     {
         crewstatsString += UtilityClass::String(crewstats[i]) + ",";
     }
-    msg = new TiXmlElement( "crewstats" );
-    msg->LinkEndChild( new TiXmlText( crewstatsString.c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "crewstats" );
+    vvvvvv_xml_append_text( msg, crewstatsString.c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
     std::string collect;
     for(size_t i = 0; i < obj.collect.size(); i++ )
     {
         collect += UtilityClass::String(obj.collect[i]) + ",";
     }
-    msg = new TiXmlElement( "collect" );
-    msg->LinkEndChild( new TiXmlText( collect.c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "collect" );
+    vvvvvv_xml_append_text( msg, collect.c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
     //telecookie.data.finalx = map.finalx;
     //telecookie.data.finaly = map.finaly;
@@ -5822,29 +5697,29 @@ void Game::savequick( mapclass& map, entityclass& obj, musicclass& music )
     //telecookie.data.savex = savex;
     //telecookie.data.savey = savey;
 
-    msg = new TiXmlElement( "finalx" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(map.finalx).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "finalx" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(map.finalx).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "finaly" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(map.finaly).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "finaly" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(map.finaly).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "savex" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(savex).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "savex" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(savex).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "savey" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(savey).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "savey" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(savey).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "saverx" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(saverx).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "saverx" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(saverx).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "savery" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(savery).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "savery" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(savery).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
     //telecookie.data.saverx = saverx;
     //telecookie.data.savery = savery;
@@ -5853,21 +5728,21 @@ void Game::savequick( mapclass& map, entityclass& obj, musicclass& music )
     //telecookie.data.savepoint = savepoint;
     //telecookie.data.trinkets = trinkets;
 
-    msg = new TiXmlElement( "savegc" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(savegc).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "savegc" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(savegc).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "savedir" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(savedir).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "savedir" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(savedir).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "savepoint" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(savepoint).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "savepoint" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(savepoint).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "trinkets" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(trinkets).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "trinkets" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(trinkets).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
 
     //if (music.nicechange != -1) {
@@ -5885,48 +5760,48 @@ void Game::savequick( mapclass& map, entityclass& obj, musicclass& music )
     //telecookie.data.scmmoveme = scmmoveme;
     if(music.nicefade==1)
     {
-        msg = new TiXmlElement( "currentsong" );
-        msg->LinkEndChild( new TiXmlText( UtilityClass::String(music.nicechange).c_str() ));
-        msgs->LinkEndChild( msg );
+        msg = vvvvvv_xml_new_element( "currentsong" );
+        vvvvvv_xml_append_text( msg, UtilityClass::String(music.nicechange).c_str() );
+        vvvvvv_xml_append( msgs, msg );
     }
     else
     {
-        msg = new TiXmlElement( "currentsong" );
-        msg->LinkEndChild( new TiXmlText( UtilityClass::String(music.currentsong).c_str() ));
-        msgs->LinkEndChild( msg );
+        msg = vvvvvv_xml_new_element( "currentsong" );
+        vvvvvv_xml_append_text( msg, UtilityClass::String(music.currentsong).c_str() );
+        vvvvvv_xml_append( msgs, msg );
     }
 
-    msg = new TiXmlElement( "teleportscript" );
-    msg->LinkEndChild( new TiXmlText( teleportscript.c_str() ));
-    msgs->LinkEndChild( msg );
-    msg = new TiXmlElement( "companion" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(companion).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "teleportscript" );
+    vvvvvv_xml_append_text( msg, teleportscript.c_str() );
+    vvvvvv_xml_append( msgs, msg );
+    msg = vvvvvv_xml_new_element( "companion" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(companion).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "lastsaved" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(lastsaved).c_str() ));
-    msgs->LinkEndChild( msg );
-    msg = new TiXmlElement( "supercrewmate" );
-    msg->LinkEndChild( new TiXmlText( BoolToString(supercrewmate) ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "lastsaved" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(lastsaved).c_str() );
+    vvvvvv_xml_append( msgs, msg );
+    msg = vvvvvv_xml_new_element( "supercrewmate" );
+    vvvvvv_xml_append_text( msg, BoolToString(supercrewmate) );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "scmprogress" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(scmprogress).c_str() ));
-    msgs->LinkEndChild( msg );
-    msg = new TiXmlElement( "scmmoveme" );
-    msg->LinkEndChild( new TiXmlText( BoolToString(scmmoveme) ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "scmprogress" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(scmprogress).c_str() );
+    vvvvvv_xml_append( msgs, msg );
+    msg = vvvvvv_xml_new_element( "scmmoveme" );
+    vvvvvv_xml_append_text( msg, BoolToString(scmmoveme) );
+    vvvvvv_xml_append( msgs, msg );
 
 
     //telecookie.data.finalmode = map.finalmode;
     //telecookie.data.finalstretch = map.finalstretch;
 
-    msg = new TiXmlElement( "finalmode" );
-    msg->LinkEndChild( new TiXmlText( BoolToString(map.finalmode) ));
-    msgs->LinkEndChild( msg );
-    msg = new TiXmlElement( "finalstretch" );
-    msg->LinkEndChild( new TiXmlText( BoolToString(map.finalstretch) ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "finalmode" );
+    vvvvvv_xml_append_text( msg, BoolToString(map.finalmode) );
+    vvvvvv_xml_append( msgs, msg );
+    msg = vvvvvv_xml_new_element( "finalstretch" );
+    vvvvvv_xml_append_text( msg, BoolToString(map.finalstretch) );
+    vvvvvv_xml_append( msgs, msg );
 
     //telecookie.data.frames = frames; telecookie.data.seconds = seconds;
     //telecookie.data.minutes = minutes; telecookie.data.hours = hours;
@@ -5940,45 +5815,45 @@ void Game::savequick( mapclass& map, entityclass& obj, musicclass& music )
     //telesummary = telecookie.data.summary;
 
 
-    msg = new TiXmlElement( "frames" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(frames).c_str() ));
-    msgs->LinkEndChild( msg );
-    msg = new TiXmlElement( "seconds" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(seconds).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "frames" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(frames).c_str() );
+    vvvvvv_xml_append( msgs, msg );
+    msg = vvvvvv_xml_new_element( "seconds" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(seconds).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "minutes" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(minutes).c_str()) );
-    msgs->LinkEndChild( msg );
-    msg = new TiXmlElement( "hours" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(hours).c_str()) );
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "minutes" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(minutes).c_str() );
+    vvvvvv_xml_append( msgs, msg );
+    msg = vvvvvv_xml_new_element( "hours" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(hours).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "deathcounts" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(deathcounts).c_str() ));
-    msgs->LinkEndChild( msg );
-    msg = new TiXmlElement( "totalflips" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(totalflips).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "deathcounts" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(deathcounts).c_str() );
+    vvvvvv_xml_append( msgs, msg );
+    msg = vvvvvv_xml_new_element( "totalflips" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(totalflips).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "hardestroom" );
-    msg->LinkEndChild( new TiXmlText( hardestroom.c_str() ));
-    msgs->LinkEndChild( msg );
-    msg = new TiXmlElement( "hardestroomdeaths" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(hardestroomdeaths).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "hardestroom" );
+    vvvvvv_xml_append_text( msg, hardestroom.c_str() );
+    vvvvvv_xml_append( msgs, msg );
+    msg = vvvvvv_xml_new_element( "hardestroomdeaths" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(hardestroomdeaths).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "summary" );
+    msg = vvvvvv_xml_new_element( "summary" );
     UtilityClass tempUtil;
     std::string summary = savearea + ", " + timestring(tempUtil);
-    msg->LinkEndChild( new TiXmlText( summary.c_str() ));
-    msgs->LinkEndChild( msg );
+    vvvvvv_xml_append_text( msg, summary.c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
     quicksummary = summary;
     //telecookie.flush();
     //telecookie.close();
 
-    if(FILESYSTEM_saveTiXmlDocument("saves/qsave.vvv", &doc))
+    if(vvvvvv_xml_save("saves/qsave.vvv", root))
     {
         printf("Game saved\n");
     }
@@ -5994,20 +5869,13 @@ void Game::customsavequick(std::string savfile, mapclass& map, entityclass& obj,
 {
     quickcookieexists = true;
 
-    TiXmlDocument doc;
-    TiXmlElement* msg;
-    TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" );
-    doc.LinkEndChild( decl );
+    VVVVVV_XML_Element* msg;
+    VVVVVV_XML_Element * root = vvvvvv_xml_new_element( "Save" );
 
-    TiXmlElement * root = new TiXmlElement( "Save" );
-    doc.LinkEndChild( root );
+    vvvvvv_xml_append_comment( root, " Save file " );
 
-    TiXmlComment * comment = new TiXmlComment();
-    comment->SetValue(" Save file " );
-    root->LinkEndChild( comment );
-
-    TiXmlElement * msgs = new TiXmlElement( "Data" );
-    root->LinkEndChild( msgs );
+    VVVVVV_XML_Element * msgs = vvvvvv_xml_new_element( "Data" );
+    vvvvvv_xml_append( root, msgs );
 
 
     //Flags, map and stats
@@ -6029,54 +5897,54 @@ void Game::customsavequick(std::string savfile, mapclass& map, entityclass& obj,
     {
         mapExplored += UtilityClass::String(map.explored[i]) + ",";
     }
-    msg = new TiXmlElement( "worldmap" );
-    msg->LinkEndChild( new TiXmlText( mapExplored.c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "worldmap" );
+    vvvvvv_xml_append_text( msg, mapExplored.c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
     std::string flags;
     for(size_t i = 0; i < obj.flags.size(); i++ )
     {
         flags += UtilityClass::String(obj.flags[i]) + ",";
     }
-    msg = new TiXmlElement( "flags" );
-    msg->LinkEndChild( new TiXmlText( flags.c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "flags" );
+    vvvvvv_xml_append_text( msg, flags.c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
     std::string moods;
     for(int i = 0; i < 6; i++ )
     {
         moods += UtilityClass::String(obj.customcrewmoods[i]) + ",";
     }
-    msg = new TiXmlElement( "moods" );
-    msg->LinkEndChild( new TiXmlText( moods.c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "moods" );
+    vvvvvv_xml_append_text( msg, moods.c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
     std::string crewstatsString;
     for(size_t i = 0; i < crewstats.size(); i++ )
     {
         crewstatsString += UtilityClass::String(crewstats[i]) + ",";
     }
-    msg = new TiXmlElement( "crewstats" );
-    msg->LinkEndChild( new TiXmlText( crewstatsString.c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "crewstats" );
+    vvvvvv_xml_append_text( msg, crewstatsString.c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
     std::string collect;
     for(size_t i = 0; i < obj.collect.size(); i++ )
     {
         collect += UtilityClass::String(obj.collect[i]) + ",";
     }
-    msg = new TiXmlElement( "collect" );
-    msg->LinkEndChild( new TiXmlText( collect.c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "collect" );
+    vvvvvv_xml_append_text( msg, collect.c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
     std::string customcollect;
     for(size_t i = 0; i < obj.customcollect.size(); i++ )
     {
         customcollect += UtilityClass::String(obj.customcollect[i]) + ",";
     }
-    msg = new TiXmlElement( "customcollect" );
-    msg->LinkEndChild( new TiXmlText( customcollect.c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "customcollect" );
+    vvvvvv_xml_append_text( msg, customcollect.c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
     //telecookie.data.finalx = map.finalx;
     //telecookie.data.finaly = map.finaly;
@@ -6084,29 +5952,29 @@ void Game::customsavequick(std::string savfile, mapclass& map, entityclass& obj,
     //telecookie.data.savex = savex;
     //telecookie.data.savey = savey;
 
-    msg = new TiXmlElement( "finalx" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(map.finalx).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "finalx" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(map.finalx).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "finaly" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(map.finaly).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "finaly" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(map.finaly).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "savex" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(savex).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "savex" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(savex).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "savey" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(savey).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "savey" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(savey).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "saverx" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(saverx).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "saverx" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(saverx).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "savery" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(savery).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "savery" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(savery).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
     //telecookie.data.saverx = saverx;
     //telecookie.data.savery = savery;
@@ -6115,25 +5983,25 @@ void Game::customsavequick(std::string savfile, mapclass& map, entityclass& obj,
     //telecookie.data.savepoint = savepoint;
     //telecookie.data.trinkets = trinkets;
 
-    msg = new TiXmlElement( "savegc" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(savegc).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "savegc" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(savegc).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "savedir" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(savedir).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "savedir" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(savedir).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "savepoint" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(savepoint).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "savepoint" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(savepoint).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "trinkets" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(trinkets).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "trinkets" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(trinkets).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "crewmates" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(crewmates).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "crewmates" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(crewmates).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
 
     //if (music.nicechange != -1) {
@@ -6151,37 +6019,37 @@ void Game::customsavequick(std::string savfile, mapclass& map, entityclass& obj,
     //telecookie.data.scmmoveme = scmmoveme;
     if(music.nicefade==1)
     {
-        msg = new TiXmlElement( "currentsong" );
-        msg->LinkEndChild( new TiXmlText( UtilityClass::String(music.nicechange).c_str() ));
-        msgs->LinkEndChild( msg );
+        msg = vvvvvv_xml_new_element( "currentsong" );
+        vvvvvv_xml_append_text( msg, UtilityClass::String(music.nicechange).c_str() );
+        vvvvvv_xml_append( msgs, msg );
     }
     else
     {
-        msg = new TiXmlElement( "currentsong" );
-        msg->LinkEndChild( new TiXmlText( UtilityClass::String(music.currentsong).c_str() ));
-        msgs->LinkEndChild( msg );
+        msg = vvvvvv_xml_new_element( "currentsong" );
+        vvvvvv_xml_append_text( msg, UtilityClass::String(music.currentsong).c_str() );
+        vvvvvv_xml_append( msgs, msg );
     }
 
-    msg = new TiXmlElement( "teleportscript" );
-    msg->LinkEndChild( new TiXmlText( teleportscript.c_str() ));
-    msgs->LinkEndChild( msg );
-    msg = new TiXmlElement( "companion" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(companion).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "teleportscript" );
+    vvvvvv_xml_append_text( msg, teleportscript.c_str() );
+    vvvvvv_xml_append( msgs, msg );
+    msg = vvvvvv_xml_new_element( "companion" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(companion).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "lastsaved" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(lastsaved).c_str() ));
-    msgs->LinkEndChild( msg );
-    msg = new TiXmlElement( "supercrewmate" );
-    msg->LinkEndChild( new TiXmlText( BoolToString(supercrewmate) ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "lastsaved" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(lastsaved).c_str() );
+    vvvvvv_xml_append( msgs, msg );
+    msg = vvvvvv_xml_new_element( "supercrewmate" );
+    vvvvvv_xml_append_text( msg, BoolToString(supercrewmate) );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "scmprogress" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(scmprogress).c_str() ));
-    msgs->LinkEndChild( msg );
-    msg = new TiXmlElement( "scmmoveme" );
-    msg->LinkEndChild( new TiXmlText( BoolToString(scmmoveme) ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "scmprogress" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(scmprogress).c_str() );
+    vvvvvv_xml_append( msgs, msg );
+    msg = vvvvvv_xml_new_element( "scmmoveme" );
+    vvvvvv_xml_append_text( msg, BoolToString(scmmoveme) );
+    vvvvvv_xml_append( msgs, msg );
 
 
     //telecookie.data.frames = frames; telecookie.data.seconds = seconds;
@@ -6196,50 +6064,50 @@ void Game::customsavequick(std::string savfile, mapclass& map, entityclass& obj,
     //telesummary = telecookie.data.summary;
 
 
-    msg = new TiXmlElement( "frames" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(frames).c_str() ));
-    msgs->LinkEndChild( msg );
-    msg = new TiXmlElement( "seconds" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(seconds).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "frames" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(frames).c_str() );
+    vvvvvv_xml_append( msgs, msg );
+    msg = vvvvvv_xml_new_element( "seconds" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(seconds).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "minutes" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(minutes).c_str()) );
-    msgs->LinkEndChild( msg );
-    msg = new TiXmlElement( "hours" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(hours).c_str()) );
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "minutes" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(minutes).c_str() );
+    vvvvvv_xml_append( msgs, msg );
+    msg = vvvvvv_xml_new_element( "hours" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(hours).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "deathcounts" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(deathcounts).c_str() ));
-    msgs->LinkEndChild( msg );
-    msg = new TiXmlElement( "totalflips" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(totalflips).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "deathcounts" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(deathcounts).c_str() );
+    vvvvvv_xml_append( msgs, msg );
+    msg = vvvvvv_xml_new_element( "totalflips" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(totalflips).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "hardestroom" );
-    msg->LinkEndChild( new TiXmlText( hardestroom.c_str() ));
-    msgs->LinkEndChild( msg );
-    msg = new TiXmlElement( "hardestroomdeaths" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(hardestroomdeaths).c_str() ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "hardestroom" );
+    vvvvvv_xml_append_text( msg, hardestroom.c_str() );
+    vvvvvv_xml_append( msgs, msg );
+    msg = vvvvvv_xml_new_element( "hardestroomdeaths" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(hardestroomdeaths).c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "showminimap" );
-    msg->LinkEndChild( new TiXmlText( BoolToString(map.customshowmm) ));
-    msgs->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "showminimap" );
+    vvvvvv_xml_append_text( msg, BoolToString(map.customshowmm) );
+    vvvvvv_xml_append( msgs, msg );
 
-    msg = new TiXmlElement( "summary" );
+    msg = vvvvvv_xml_new_element( "summary" );
     UtilityClass tempUtil;
     std::string summary = savearea + ", " + timestring(tempUtil);
-    msg->LinkEndChild( new TiXmlText( summary.c_str() ));
-    msgs->LinkEndChild( msg );
+    vvvvvv_xml_append_text( msg, summary.c_str() );
+    vvvvvv_xml_append( msgs, msg );
 
     customquicksummary = summary;
     //telecookie.flush();
     //telecookie.close();
 
     std::string levelfile = savfile.substr(7);
-    if(FILESYSTEM_saveTiXmlDocument(("saves/"+levelfile+".vvv").c_str(), &doc))
+    if(vvvvvv_xml_save(("saves/"+levelfile+".vvv").c_str(), root))
     {
         printf("Game saved\n");
     }
@@ -6253,31 +6121,15 @@ void Game::customsavequick(std::string savfile, mapclass& map, entityclass& obj,
 
 void Game::loadtele( mapclass& map, entityclass& obj, musicclass& music )
 {
-    TiXmlDocument doc;
-    if (!FILESYSTEM_loadTiXmlDocument("saves/tsave.vvv", &doc)) return;
+    VVVVVV_XML_Document *doc = vvvvvv_xml_load("saves/tsave.vvv");
+    if (!doc) return;
 
-    TiXmlHandle hDoc(&doc);
-    TiXmlElement* pElem;
-    TiXmlHandle hRoot(0);
-
-
+    VVVVVV_XML_Element *pElem;
+    VVVVVV_XML_Element *hRoot = vvvvvv_xml_root(doc);
+    for( pElem = vvvvvv_xml_first_child_element(vvvvvv_xml_first_child_element_named( hRoot, "Data" )); pElem; pElem=vvvvvv_xml_next_sibling_element(pElem))
     {
-        pElem=hDoc.FirstChildElement().Element();
-        // should always have a valid root but handle gracefully if it does
-        if (!pElem)
-        {
-            printf("Save Not Found\n");
-        }
-
-        // save this for later
-        hRoot=TiXmlHandle(pElem);
-    }
-
-
-    for( pElem = hRoot.FirstChild( "Data" ).FirstChild().Element(); pElem; pElem=pElem->NextSiblingElement())
-    {
-        std::string pKey(pElem->Value());
-        const char* pText = pElem->GetText() ;
+        std::string pKey(vvvvvv_xml_name(pElem));
+        const char* pText = vvvvvv_xml_text(pElem) ;
         if(pText == NULL)
         {
             pText = "";
@@ -6470,6 +6322,8 @@ void Game::loadtele( mapclass& map, entityclass& obj, musicclass& music )
     map.showteleporters = true;
     if(obj.flags[12]==1) map.showtargets = true;
     if (obj.flags[42] == 1) map.showtrinkets = true;
+
+    vvvvvv_xml_free(doc);
 }
 
 std::string Game::unrescued()

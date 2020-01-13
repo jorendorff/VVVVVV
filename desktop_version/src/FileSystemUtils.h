@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "tinyxml.h"
+#include "vxml.h"
 
 int FILESYSTEM_init(char *argvZero);
 void FILESYSTEM_deinit();

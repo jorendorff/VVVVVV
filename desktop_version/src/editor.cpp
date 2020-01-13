@@ -9,7 +9,7 @@
 //#include "UtilityClass.h"
 #include "time.h"
 
-#include "tinyxml.h"
+#include "vxml.h"
 
 #include "Enums.h"
 
@@ -116,40 +116,19 @@ void editorclass::getDirectoryData()
 }
 bool editorclass::getLevelMetaData(std::string& _path, LevelMetaData& _data )
 {
-    unsigned char *mem = NULL;
-    FILESYSTEM_loadFileToMemory(_path.c_str(), &mem, NULL);
-
-    if (mem == NULL)
+    VVVVVV_XML_Document *doc = vvvvvv_xml_load(_path.c_str());
+    if (!doc)
     {
         printf("Level %s not found :(\n", _path.c_str());
         return false;
     }
 
-    TiXmlDocument doc;
-    doc.Parse((const char*) mem);
-    FILESYSTEM_freeMemory(&mem);
-
-    TiXmlHandle hDoc(&doc);
-    TiXmlElement* pElem;
-    TiXmlHandle hRoot(0);
-
-
+    VVVVVV_XML_Element *hRoot = vvvvvv_xml_root(doc);
+    VVVVVV_XML_Element *pElem;
+    for( pElem = vvvvvv_xml_first_child_element(vvvvvv_xml_first_child_element_named( hRoot, "Data" )); pElem; pElem=vvvvvv_xml_next_sibling_element(pElem))
     {
-        pElem=hDoc.FirstChildElement().Element();
-        // should always have a valid root but handle gracefully if it does
-        if (!pElem)
-        {
-            printf("No valid root! Corrupt level file?\n");
-        }
-
-        // save this for later
-        hRoot=TiXmlHandle(pElem);
-    }
-
-    for( pElem = hRoot.FirstChild( "Data" ).FirstChild().Element(); pElem; pElem=pElem->NextSiblingElement())
-    {
-        std::string pKey(pElem->Value());
-        const char* pText = pElem->GetText() ;
+        std::string pKey(vvvvvv_xml_name(pElem));
+        const char* pText = vvvvvv_xml_text(pElem) ;
         if(pText == NULL)
         {
             pText = "";
@@ -158,10 +137,10 @@ bool editorclass::getLevelMetaData(std::string& _path, LevelMetaData& _data )
         if (pKey == "MetaData")
         {
 
-            for( TiXmlElement* subElem = pElem->FirstChildElement(); subElem; subElem= subElem->NextSiblingElement())
+            for( VVVVVV_XML_Element* subElem = vvvvvv_xml_first_child_element(pElem); subElem; subElem= vvvvvv_xml_next_sibling_element(subElem))
             {
-                std::string pKey(subElem->Value());
-                const char* pText = subElem->GetText() ;
+                std::string pKey(vvvvvv_xml_name(subElem));
+                const char* pText = vvvvvv_xml_text(subElem) ;
                 if(pText == NULL)
                 {
                     pText = "";
@@ -1710,46 +1689,28 @@ void editorclass::load(std::string& _path)
 {
     reset();
 
-    unsigned char *mem = NULL;
     static const char *levelDir = "levels/";
     if (_path.compare(0, strlen(levelDir), levelDir) != 0)
     {
         _path = levelDir + _path;
     }
-    FILESYSTEM_loadFileToMemory(_path.c_str(), &mem, NULL);
 
-    if (mem == NULL)
+    VVVVVV_XML_Document *doc = vvvvvv_xml_load(_path.c_str());
+    if (!doc)
     {
         printf("No level %s to load :(\n", _path.c_str());
         return;
     }
 
-    TiXmlDocument doc;
-    doc.Parse((const char*) mem);
-    FILESYSTEM_freeMemory(&mem);
-
-    TiXmlHandle hDoc(&doc);
-    TiXmlElement* pElem;
-    TiXmlHandle hRoot(0);
+    VVVVVV_XML_Element *pElem;
+    VVVVVV_XML_Element *hRoot = vvvvvv_xml_root(doc);
     version = 0;
+    vvvvvv_xml_query_int_attribute(hRoot, "version", &version);
 
+    for( pElem = vvvvvv_xml_first_child_element(vvvvvv_xml_first_child_element_named( hRoot, "Data" )); pElem; pElem=vvvvvv_xml_next_sibling_element(pElem))
     {
-        pElem=hDoc.FirstChildElement().Element();
-        // should always have a valid root but handle gracefully if it does
-        if (!pElem)
-        {
-            printf("No valid root! Corrupt level file?\n");
-        }
-
-        pElem->QueryIntAttribute("version", &version);
-        // save this for later
-        hRoot=TiXmlHandle(pElem);
-    }
-
-    for( pElem = hRoot.FirstChild( "Data" ).FirstChild().Element(); pElem; pElem=pElem->NextSiblingElement())
-    {
-        std::string pKey(pElem->Value());
-        const char* pText = pElem->GetText() ;
+        std::string pKey(vvvvvv_xml_name(pElem));
+        const char* pText = vvvvvv_xml_text(pElem) ;
         if(pText == NULL)
         {
             pText = "";
@@ -1758,10 +1719,10 @@ void editorclass::load(std::string& _path)
         if (pKey == "MetaData")
         {
 
-            for( TiXmlElement* subElem = pElem->FirstChildElement(); subElem; subElem= subElem->NextSiblingElement())
+            for( VVVVVV_XML_Element* subElem = vvvvvv_xml_first_child_element(pElem); subElem; subElem= vvvvvv_xml_next_sibling_element(subElem))
             {
-                std::string pKey(subElem->Value());
-                const char* pText = subElem->GetText() ;
+                std::string pKey(vvvvvv_xml_name(subElem));
+                const char* pText = vvvvvv_xml_text(subElem) ;
                 if(pText == NULL)
                 {
                     pText = "";
@@ -1861,24 +1822,24 @@ void editorclass::load(std::string& _path)
         if (pKey == "edEntities")
         {
             int i = 0;
-            for( TiXmlElement* edEntityEl = pElem->FirstChildElement(); edEntityEl; edEntityEl=edEntityEl->NextSiblingElement())
+            for( VVVVVV_XML_Element* edEntityEl = vvvvvv_xml_first_child_element(pElem); edEntityEl; edEntityEl=vvvvvv_xml_next_sibling_element(edEntityEl))
             {
-                std::string pKey(edEntityEl->Value());
-                //const char* pText = edEntityEl->GetText() ;
-                if(edEntityEl->GetText() != NULL)
+                std::string pKey(vvvvvv_xml_name(edEntityEl));
+                //const char* pText = vvvvvv_xml_text(edEntityEl) ;
+                if(vvvvvv_xml_text(edEntityEl) != NULL)
                 {
-                    edentity[i].scriptname = std::string(edEntityEl->GetText()) ;
+                    edentity[i].scriptname = std::string(vvvvvv_xml_text(edEntityEl)) ;
                 }
-                edEntityEl->QueryIntAttribute("x", &edentity[i].x);
-                edEntityEl->QueryIntAttribute("y", &edentity[i].y);
-                edEntityEl->QueryIntAttribute("t", &edentity[i].t);
+                vvvvvv_xml_query_int_attribute(edEntityEl, "x", &edentity[i].x);
+                vvvvvv_xml_query_int_attribute(edEntityEl, "y", &edentity[i].y);
+                vvvvvv_xml_query_int_attribute(edEntityEl, "t", &edentity[i].t);
 
-                edEntityEl->QueryIntAttribute("p1", &edentity[i].p1);
-                edEntityEl->QueryIntAttribute("p2", &edentity[i].p2);
-                edEntityEl->QueryIntAttribute("p3", &edentity[i].p3);
-                edEntityEl->QueryIntAttribute("p4", &edentity[i].p4);
-                edEntityEl->QueryIntAttribute("p5", &edentity[i].p5);
-                edEntityEl->QueryIntAttribute("p6", &edentity[i].p6);
+                vvvvvv_xml_query_int_attribute(edEntityEl, "p1", &edentity[i].p1);
+                vvvvvv_xml_query_int_attribute(edEntityEl, "p2", &edentity[i].p2);
+                vvvvvv_xml_query_int_attribute(edEntityEl, "p3", &edentity[i].p3);
+                vvvvvv_xml_query_int_attribute(edEntityEl, "p4", &edentity[i].p4);
+                vvvvvv_xml_query_int_attribute(edEntityEl, "p5", &edentity[i].p5);
+                vvvvvv_xml_query_int_attribute(edEntityEl, "p6", &edentity[i].p6);
 
                 i++;
 
@@ -1890,29 +1851,29 @@ void editorclass::load(std::string& _path)
         if (pKey == "levelMetaData")
         {
             int i = 0;
-            for( TiXmlElement* edLevelClassElement = pElem->FirstChildElement(); edLevelClassElement; edLevelClassElement=edLevelClassElement->NextSiblingElement())
+            for( VVVVVV_XML_Element* edLevelClassElement = vvvvvv_xml_first_child_element(pElem); edLevelClassElement; edLevelClassElement=vvvvvv_xml_next_sibling_element(edLevelClassElement))
             {
-                std::string pKey(edLevelClassElement->Value());
-                if(edLevelClassElement->GetText() != NULL)
+                std::string pKey(vvvvvv_xml_name(edLevelClassElement));
+                if(vvvvvv_xml_text(edLevelClassElement) != NULL)
                 {
-                    level[i].roomname = std::string(edLevelClassElement->GetText()) ;
+                    level[i].roomname = std::string(vvvvvv_xml_text(edLevelClassElement)) ;
                 }
 
-                edLevelClassElement->QueryIntAttribute("tileset", &level[i].tileset);
-                edLevelClassElement->QueryIntAttribute("tilecol", &level[i].tilecol);
-                edLevelClassElement->QueryIntAttribute("platx1", &level[i].platx1);
-                edLevelClassElement->QueryIntAttribute("platy1", &level[i].platy1);
-                edLevelClassElement->QueryIntAttribute("platx2", &level[i].platx2);
-                edLevelClassElement->QueryIntAttribute("platy2", &level[i].platy2);
-                edLevelClassElement->QueryIntAttribute("platv", &level[i].platv);
-                edLevelClassElement->QueryIntAttribute("enemyx1", &level[i].enemyx1);
-                edLevelClassElement->QueryIntAttribute("enemyy1", &level[i].enemyy1);
-                edLevelClassElement->QueryIntAttribute("enemyx2", &level[i].enemyx2);
-                edLevelClassElement->QueryIntAttribute("enemyy2", &level[i].enemyy2);
-                edLevelClassElement->QueryIntAttribute("enemytype", &level[i].enemytype);
-                edLevelClassElement->QueryIntAttribute("directmode", &level[i].directmode);
+                vvvvvv_xml_query_int_attribute(edLevelClassElement, "tileset", &level[i].tileset);
+                vvvvvv_xml_query_int_attribute(edLevelClassElement, "tilecol", &level[i].tilecol);
+                vvvvvv_xml_query_int_attribute(edLevelClassElement, "platx1", &level[i].platx1);
+                vvvvvv_xml_query_int_attribute(edLevelClassElement, "platy1", &level[i].platy1);
+                vvvvvv_xml_query_int_attribute(edLevelClassElement, "platx2", &level[i].platx2);
+                vvvvvv_xml_query_int_attribute(edLevelClassElement, "platy2", &level[i].platy2);
+                vvvvvv_xml_query_int_attribute(edLevelClassElement, "platv", &level[i].platv);
+                vvvvvv_xml_query_int_attribute(edLevelClassElement, "enemyx1", &level[i].enemyx1);
+                vvvvvv_xml_query_int_attribute(edLevelClassElement, "enemyy1", &level[i].enemyy1);
+                vvvvvv_xml_query_int_attribute(edLevelClassElement, "enemyx2", &level[i].enemyx2);
+                vvvvvv_xml_query_int_attribute(edLevelClassElement, "enemyy2", &level[i].enemyy2);
+                vvvvvv_xml_query_int_attribute(edLevelClassElement, "enemytype", &level[i].enemytype);
+                vvvvvv_xml_query_int_attribute(edLevelClassElement, "directmode", &level[i].directmode);
 
-                edLevelClassElement->QueryIntAttribute("warpdir", &level[i].warpdir);
+                vvvvvv_xml_query_int_attribute(edLevelClassElement, "warpdir", &level[i].warpdir);
 
                 i++;
 
@@ -1944,23 +1905,16 @@ void editorclass::load(std::string& _path)
 
 void editorclass::save(std::string& _path)
 {
-    TiXmlDocument doc;
-    TiXmlElement* msg;
-    TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" );
-    doc.LinkEndChild( decl );
+    VVVVVV_XML_Element* msg;
+    VVVVVV_XML_Element * root = vvvvvv_xml_new_element( "MapData" );
+    vvvvvv_xml_set_attribute(root, "version",version);
 
-    TiXmlElement * root = new TiXmlElement( "MapData" );
-    root->SetAttribute("version",version);
-    doc.LinkEndChild( root );
+    vvvvvv_xml_append_comment( root, " Save file " );
 
-    TiXmlComment * comment = new TiXmlComment();
-    comment->SetValue(" Save file " );
-    root->LinkEndChild( comment );
+    VVVVVV_XML_Element * data = vvvvvv_xml_new_element( "Data" );
+    vvvvvv_xml_append( root, data );
 
-    TiXmlElement * data = new TiXmlElement( "Data" );
-    root->LinkEndChild( data );
-
-    msg = new TiXmlElement( "MetaData" );
+    msg = vvvvvv_xml_new_element( "MetaData" );
 
     time_t rawtime;
     struct tm * timeinfo;
@@ -1978,55 +1932,55 @@ void editorclass::save(std::string& _path)
     }
 
     //getUser
-    TiXmlElement* meta = new TiXmlElement( "Creator" );
-    meta->LinkEndChild( new TiXmlText( EditorData::GetInstance().creator.c_str() ));
-    msg->LinkEndChild( meta );
+    VVVVVV_XML_Element* meta = vvvvvv_xml_new_element( "Creator" );
+    vvvvvv_xml_append_text( meta, EditorData::GetInstance().creator.c_str() );
+    vvvvvv_xml_append( msg, meta );
 
-    meta = new TiXmlElement( "Title" );
-    meta->LinkEndChild( new TiXmlText( EditorData::GetInstance().title.c_str() ));
-    msg->LinkEndChild( meta );
+    meta = vvvvvv_xml_new_element( "Title" );
+    vvvvvv_xml_append_text( meta, EditorData::GetInstance().title.c_str() );
+    vvvvvv_xml_append( msg, meta );
 
-    meta = new TiXmlElement( "Created" );
-    meta->LinkEndChild( new TiXmlText( UtilityClass::String(version).c_str() ));
-    msg->LinkEndChild( meta );
+    meta = vvvvvv_xml_new_element( "Created" );
+    vvvvvv_xml_append_text( meta, UtilityClass::String(version).c_str() );
+    vvvvvv_xml_append( msg, meta );
 
-    meta = new TiXmlElement( "Modified" );
-    meta->LinkEndChild( new TiXmlText( EditorData::GetInstance().modifier.c_str() ) );
-    msg->LinkEndChild( meta );
+    meta = vvvvvv_xml_new_element( "Modified" );
+    vvvvvv_xml_append_text( meta, EditorData::GetInstance().modifier.c_str()  );
+    vvvvvv_xml_append( msg, meta );
 
-    meta = new TiXmlElement( "Modifiers" );
-    meta->LinkEndChild( new TiXmlText( UtilityClass::String(version).c_str() ));
-    msg->LinkEndChild( meta );
+    meta = vvvvvv_xml_new_element( "Modifiers" );
+    vvvvvv_xml_append_text( meta, UtilityClass::String(version).c_str() );
+    vvvvvv_xml_append( msg, meta );
 
-    meta = new TiXmlElement( "Desc1" );
-    meta->LinkEndChild( new TiXmlText( Desc1.c_str() ));
-    msg->LinkEndChild( meta );
+    meta = vvvvvv_xml_new_element( "Desc1" );
+    vvvvvv_xml_append_text( meta, Desc1.c_str() );
+    vvvvvv_xml_append( msg, meta );
 
-    meta = new TiXmlElement( "Desc2" );
-    meta->LinkEndChild( new TiXmlText( Desc2.c_str() ));
-    msg->LinkEndChild( meta );
+    meta = vvvvvv_xml_new_element( "Desc2" );
+    vvvvvv_xml_append_text( meta, Desc2.c_str() );
+    vvvvvv_xml_append( msg, meta );
 
-    meta = new TiXmlElement( "Desc3" );
-    meta->LinkEndChild( new TiXmlText( Desc3.c_str() ));
-    msg->LinkEndChild( meta );
+    meta = vvvvvv_xml_new_element( "Desc3" );
+    vvvvvv_xml_append_text( meta, Desc3.c_str() );
+    vvvvvv_xml_append( msg, meta );
 
-    meta = new TiXmlElement( "website" );
-    meta->LinkEndChild( new TiXmlText( website.c_str() ));
-    msg->LinkEndChild( meta );
+    meta = vvvvvv_xml_new_element( "website" );
+    vvvvvv_xml_append_text( meta, website.c_str() );
+    vvvvvv_xml_append( msg, meta );
 
-    data->LinkEndChild( msg );
+    vvvvvv_xml_append( data, msg );
 
-    msg = new TiXmlElement( "mapwidth" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(mapwidth).c_str() ));
-    data->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "mapwidth" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(mapwidth).c_str() );
+    vvvvvv_xml_append( data, msg );
 
-    msg = new TiXmlElement( "mapheight" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(mapheight).c_str() ));
-    data->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "mapheight" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(mapheight).c_str() );
+    vvvvvv_xml_append( data, msg );
 
-    msg = new TiXmlElement( "levmusic" );
-    msg->LinkEndChild( new TiXmlText( UtilityClass::String(levmusic).c_str() ));
-    data->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "levmusic" );
+    vvvvvv_xml_append_text( msg, UtilityClass::String(levmusic).c_str() );
+    vvvvvv_xml_append( data, msg );
 
     //New save format
     std::string contentsString="";
@@ -2037,9 +1991,9 @@ void editorclass::save(std::string& _path)
             contentsString += UtilityClass::String(contents[x + (maxwidth*40*y)]) + ",";
         }
     }
-    msg = new TiXmlElement( "contents" );
-    msg->LinkEndChild( new TiXmlText( contentsString.c_str() ));
-    data->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "contents" );
+    vvvvvv_xml_append_text( msg, contentsString.c_str() );
+    vvvvvv_xml_append( data, msg );
 
 
     //Old save format
@@ -2049,65 +2003,65 @@ void editorclass::save(std::string& _path)
     {
     	contentsString += UtilityClass::String(contents[i]) + ",";
     }
-    msg = new TiXmlElement( "contents" );
-    msg->LinkEndChild( new TiXmlText( contentsString.c_str() ));
-    data->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "contents" );
+    vvvvvv_xml_append_text( msg, contentsString.c_str() );
+    vvvvvv_xml_append( data, msg );
     */
 
-    msg = new TiXmlElement( "edEntities" );
+    msg = vvvvvv_xml_new_element( "edEntities" );
     for(int i = 0; i < EditorData::GetInstance().numedentities; i++)
     {
-        TiXmlElement *edentityElement = new TiXmlElement( "edentity" );
-        edentityElement->SetAttribute( "x", edentity[i].x);
-        edentityElement->SetAttribute(  "y", edentity[i].y);
-        edentityElement->SetAttribute(  "t", edentity[i].t);
-        edentityElement->SetAttribute(  "p1", edentity[i].p1);
-        edentityElement->SetAttribute(  "p2", edentity[i].p2);
-        edentityElement->SetAttribute(  "p3", edentity[i].p3);
-        edentityElement->SetAttribute( "p4", edentity[i].p4);
-        edentityElement->SetAttribute( "p5", edentity[i].p5);
-        edentityElement->SetAttribute(  "p6", edentity[i].p6);
-        edentityElement->LinkEndChild( new TiXmlText( edentity[i].scriptname.c_str() )) ;
-        edentityElement->LinkEndChild( new TiXmlText( "" )) ;
-        msg->LinkEndChild( edentityElement );
+        VVVVVV_XML_Element *edentityElement = vvvvvv_xml_new_element( "edentity" );
+        vvvvvv_xml_set_attribute(edentityElement,  "x", edentity[i].x);
+        vvvvvv_xml_set_attribute(edentityElement,   "y", edentity[i].y);
+        vvvvvv_xml_set_attribute(edentityElement,   "t", edentity[i].t);
+        vvvvvv_xml_set_attribute(edentityElement,   "p1", edentity[i].p1);
+        vvvvvv_xml_set_attribute(edentityElement,   "p2", edentity[i].p2);
+        vvvvvv_xml_set_attribute(edentityElement,   "p3", edentity[i].p3);
+        vvvvvv_xml_set_attribute(edentityElement,  "p4", edentity[i].p4);
+        vvvvvv_xml_set_attribute(edentityElement,  "p5", edentity[i].p5);
+        vvvvvv_xml_set_attribute(edentityElement,   "p6", edentity[i].p6);
+        vvvvvv_xml_append_text( edentityElement, edentity[i].scriptname.c_str() ) ;
+        vvvvvv_xml_append_text( edentityElement, "" ) ;
+        vvvvvv_xml_append( msg, edentityElement );
     }
 
-    data->LinkEndChild( msg );
+    vvvvvv_xml_append( data, msg );
 
-    msg = new TiXmlElement( "levelMetaData" );
+    msg = vvvvvv_xml_new_element( "levelMetaData" );
     for(int i = 0; i < 400; i++)
     {
-        TiXmlElement *edlevelclassElement = new TiXmlElement( "edLevelClass" );
-        edlevelclassElement->SetAttribute( "tileset", level[i].tileset);
-        edlevelclassElement->SetAttribute(  "tilecol", level[i].tilecol);
-        edlevelclassElement->SetAttribute(  "platx1", level[i].platx1);
-        edlevelclassElement->SetAttribute(  "platy1", level[i].platy1);
-        edlevelclassElement->SetAttribute(  "platx2", level[i].platx2);
-        edlevelclassElement->SetAttribute( "platy2", level[i].platy2);
-        edlevelclassElement->SetAttribute( "platv", level[i].platv);
-        edlevelclassElement->SetAttribute(  "enemyx1", level[i].enemyx1);
-        edlevelclassElement->SetAttribute(  "enemyy1", level[i].enemyy1);
-        edlevelclassElement->SetAttribute(  "enemyx2", level[i].enemyx2);
-        edlevelclassElement->SetAttribute(  "enemyy2", level[i].enemyy2);
-        edlevelclassElement->SetAttribute(  "enemytype", level[i].enemytype);
-        edlevelclassElement->SetAttribute(  "directmode", level[i].directmode);
-        edlevelclassElement->SetAttribute(  "warpdir", level[i].warpdir);
+        VVVVVV_XML_Element *edlevelclassElement = vvvvvv_xml_new_element( "edLevelClass" );
+        vvvvvv_xml_set_attribute(edlevelclassElement,  "tileset", level[i].tileset);
+        vvvvvv_xml_set_attribute(edlevelclassElement,   "tilecol", level[i].tilecol);
+        vvvvvv_xml_set_attribute(edlevelclassElement,   "platx1", level[i].platx1);
+        vvvvvv_xml_set_attribute(edlevelclassElement,   "platy1", level[i].platy1);
+        vvvvvv_xml_set_attribute(edlevelclassElement,   "platx2", level[i].platx2);
+        vvvvvv_xml_set_attribute(edlevelclassElement,  "platy2", level[i].platy2);
+        vvvvvv_xml_set_attribute(edlevelclassElement,  "platv", level[i].platv);
+        vvvvvv_xml_set_attribute(edlevelclassElement,   "enemyx1", level[i].enemyx1);
+        vvvvvv_xml_set_attribute(edlevelclassElement,   "enemyy1", level[i].enemyy1);
+        vvvvvv_xml_set_attribute(edlevelclassElement,   "enemyx2", level[i].enemyx2);
+        vvvvvv_xml_set_attribute(edlevelclassElement,   "enemyy2", level[i].enemyy2);
+        vvvvvv_xml_set_attribute(edlevelclassElement,   "enemytype", level[i].enemytype);
+        vvvvvv_xml_set_attribute(edlevelclassElement,   "directmode", level[i].directmode);
+        vvvvvv_xml_set_attribute(edlevelclassElement,   "warpdir", level[i].warpdir);
 
-        edlevelclassElement->LinkEndChild( new TiXmlText( level[i].roomname.c_str() )) ;
-        msg->LinkEndChild( edlevelclassElement );
+        vvvvvv_xml_append_text( edlevelclassElement, level[i].roomname.c_str() ) ;
+        vvvvvv_xml_append( msg, edlevelclassElement );
     }
-    data->LinkEndChild( msg );
+    vvvvvv_xml_append( data, msg );
 
     std::string scriptString;
     for(size_t i = 0; i < script.customscript.size(); i++ )
     {
         scriptString += script.customscript[i] + "|";
     }
-    msg = new TiXmlElement( "script" );
-    msg->LinkEndChild( new TiXmlText( scriptString.c_str() ));
-    data->LinkEndChild( msg );
+    msg = vvvvvv_xml_new_element( "script" );
+    vvvvvv_xml_append_text( msg, scriptString.c_str() );
+    vvvvvv_xml_append( data, msg );
 
-    FILESYSTEM_saveTiXmlDocument(("levels/" + _path).c_str(), &doc);
+    vvvvvv_xml_save(("levels/" + _path).c_str(), root);
 }
 
 

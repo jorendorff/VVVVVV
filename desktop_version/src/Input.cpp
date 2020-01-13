@@ -2,7 +2,7 @@
 
 #include "MakeAndPlay.h"
 
-#include "tinyxml.h"
+#include "vxml.h"
 
 #include "FileSystemUtils.h"
 
@@ -361,14 +361,15 @@ void titleinput(KeyPoll& key, Graphics& dwgfx, mapclass& map, Game& game, entity
                     game.customlevelfilename=ed.ListOfMetaData[game.playcustomlevel].filename;
 
                     std::string name = "saves/" + ed.ListOfMetaData[game.playcustomlevel].filename.substr(7) + ".vvv";
-                    TiXmlDocument doc;
-	                  if (!FILESYSTEM_loadTiXmlDocument(name.c_str(), &doc)){
+                    VVVVVV_XML_Document *doc = vvvvvv_xml_load(name.c_str());
+                    if (!doc) {
 	                    game.mainmenu = 22;
                       dwgfx.fademode = 2;
 	                  }else{
                       music.playef(11, 10);
                       game.createmenu("quickloadlevel");
                       map.nexttowercolour();
+                      vvvvvv_xml_free(doc);
 	                  }
                   }
                 }
