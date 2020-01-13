@@ -5465,21 +5465,6 @@ void Game::savequick( mapclass& map, entityclass& obj, musicclass& music )
     VVVVVV_XML_Element * msgs = vvvvvv_xml_new_element( "Data" );
     vvvvvv_xml_append( root, msgs );
 
-
-    //Flags, map and stats
-    //savestate[1].explored = map.explored.slice();
-    //savestate[1].flags = obj.flags.slice();
-    //savestate[1].crewstats = crewstats.slice();
-    //savestate[1].collect = obj.collect.slice();
-
-    //telecookie.data.worldmap = savestate[1].explored.slice();
-    //telecookie.data.flags = savestate[1].flags.slice();
-    //telecookie.data.crewstats = savestate[1].crewstats.slice();
-    //telecookie.data.collect = savestate[1].collect.slice();
-
-    //telecookie.data.finalmode = map.finalmode;
-    //telecookie.data.finalstretch = map.finalstretch;
-
     std::string mapExplored;
     for(size_t i = 0; i < map.explored.size(); i++ )
     {
@@ -5508,12 +5493,6 @@ void Game::savequick( mapclass& map, entityclass& obj, musicclass& music )
     }
     vvvvvv_xml_append_str(msgs, "collect", collect.c_str());
 
-    //telecookie.data.finalx = map.finalx;
-    //telecookie.data.finaly = map.finaly;
-    //Position
-    //telecookie.data.savex = savex;
-    //telecookie.data.savey = savey;
-
     vvvvvv_xml_append_int(msgs, "finalx", map.finalx);
     vvvvvv_xml_append_int(msgs, "finaly", map.finaly);
     vvvvvv_xml_append_int(msgs, "savex", savex);
@@ -5521,31 +5500,11 @@ void Game::savequick( mapclass& map, entityclass& obj, musicclass& music )
     vvvvvv_xml_append_int(msgs, "saverx", saverx);
     vvvvvv_xml_append_int(msgs, "savery", savery);
 
-    //telecookie.data.saverx = saverx;
-    //telecookie.data.savery = savery;
-    //telecookie.data.savegc = savegc;
-    //telecookie.data.savedir = savedir;
-    //telecookie.data.savepoint = savepoint;
-    //telecookie.data.trinkets = trinkets;
-
     vvvvvv_xml_append_int(msgs, "savegc", savegc);
     vvvvvv_xml_append_int(msgs, "savedir", savedir);
     vvvvvv_xml_append_int(msgs, "savepoint", savepoint);
     vvvvvv_xml_append_int(msgs, "trinkets", trinkets);
 
-    //if (music.nicechange != -1) {
-    //telecookie.data.currentsong = music.nicechange;
-    //}else{
-    //telecookie.data.currentsong = music.currentsong;
-    //}
-    //telecookie.data.teleportscript = teleportscript;
-
-    //Special stats
-    //telecookie.data.companion = companion;
-    //telecookie.data.lastsaved = lastsaved;
-    //telecookie.data.supercrewmate = supercrewmate;
-    //telecookie.data.scmprogress = scmprogress;
-    //telecookie.data.scmmoveme = scmmoveme;
     if(music.nicefade==1)
     {
         vvvvvv_xml_append_int(msgs, "currentsong", music.nicechange);
@@ -5561,24 +5520,8 @@ void Game::savequick( mapclass& map, entityclass& obj, musicclass& music )
     vvvvvv_xml_append_bool(msgs, "supercrewmate", supercrewmate);
     vvvvvv_xml_append_int(msgs, "scmprogress", scmprogress);
     vvvvvv_xml_append_bool(msgs, "scmmoveme", scmmoveme);
-
-    //telecookie.data.finalmode = map.finalmode;
-    //telecookie.data.finalstretch = map.finalstretch;
-
     vvvvvv_xml_append_bool(msgs, "finalmode", map.finalmode);
     vvvvvv_xml_append_bool(msgs, "finalstretch", map.finalstretch);
-
-    //telecookie.data.frames = frames; telecookie.data.seconds = seconds;
-    //telecookie.data.minutes = minutes; telecookie.data.hours = hours;
-
-    //telecookie.data.deathcounts = deathcounts;
-    //telecookie.data.totalflips = totalflips;
-    //telecookie.data.hardestroom = hardestroom; telecookie.data.hardestroomdeaths = hardestroomdeaths;
-
-    //savearea = map.currentarea(map.area(roomx, roomy))
-    //telecookie.data.summary = savearea + ", " + timestring(help);
-    //telesummary = telecookie.data.summary;
-
     vvvvvv_xml_append_int(msgs, "frames", frames);
     vvvvvv_xml_append_int(msgs, "seconds", seconds);
     vvvvvv_xml_append_int(msgs, "minutes", minutes);
@@ -5593,8 +5536,6 @@ void Game::savequick( mapclass& map, entityclass& obj, musicclass& music )
     vvvvvv_xml_append_str(msgs, "summary", summary.c_str());
 
     quicksummary = summary;
-    //telecookie.flush();
-    //telecookie.close();
 
     if(vvvvvv_xml_save("saves/qsave.vvv", root))
     {
