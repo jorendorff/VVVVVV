@@ -7,10 +7,7 @@ cmake_install.cmake
 VVVVVV.exe
 VVVVVV
 *.a
-lodepng/*.o
-physfs/*.o
 src/*.o
-tinyxml/*.o
 vvvvvv
 
 # Game data
