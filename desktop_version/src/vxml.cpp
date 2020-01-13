@@ -99,6 +99,5 @@ VVVVVV_XML_Document* vvvvvv_xml_load(const char *filename) {
 }
 
 void vvvvvv_xml_free(VVVVVV_XML_Document *document) {
-    std::unique_ptr<TiXmlDocument> doc;
-    doc.reset(document);
+    delete document;
 }
