@@ -739,7 +739,7 @@ void titlerender(Graphics& dwgfx, mapclass& map, Game& game, entityclass& obj, U
                 dwgfx.Print(220, 85-15, "+1 Rank!", 255, 255, 255);
             }
 
-            tempstring = help.String(game.deathcounts);
+            tempstring = UtilityClass::String(game.deathcounts);
             dwgfx.drawspritesetcol(30-4, 80+20-4, 12, 22, help);
             dwgfx.Print(65, 80+20, "NUMBER OF DEATHS:", 255, 255, 255);
             dwgfx.Print(65, 90+20, tempstring, tr, tg, tb);
@@ -748,7 +748,7 @@ void titlerender(Graphics& dwgfx, mapclass& map, Game& game, entityclass& obj, U
                 dwgfx.Print(220, 85+20, "+1 Rank!", 255, 255, 255);
             }
 
-            tempstring = help.String(game.trinkets) + " of " + help.String(game.timetrialshinytarget);
+            tempstring = UtilityClass::String(game.trinkets) + " of " + UtilityClass::String(game.timetrialshinytarget);
             dwgfx.drawspritesetcol(30, 80+55, 22, 22, help);
             dwgfx.Print(65, 80+55, "SHINY TRINKETS:", 255, 255, 255);
             dwgfx.Print(65, 90+55, tempstring, tr, tg, tb);
@@ -804,8 +804,8 @@ void titlerender(Graphics& dwgfx, mapclass& map, Game& game, entityclass& obj, U
                         dwgfx.Print( 16, 75, "BEST SHINY ", tr, tg, tb);
                         dwgfx.Print( 16, 85, "BEST LIVES ", tr, tg, tb);
                         dwgfx.Print( 110, 65, game.timetstring(game.besttimes[0], help), tr, tg, tb);
-                        dwgfx.Print( 110, 75, help.String(game.besttrinkets[0])+"/2", tr, tg, tb);
-                        dwgfx.Print( 110, 85,help.String(game.bestlives[0]), tr, tg, tb);
+                        dwgfx.Print( 110, 75, UtilityClass::String(game.besttrinkets[0])+"/2", tr, tg, tb);
+                        dwgfx.Print( 110, 85,UtilityClass::String(game.bestlives[0]), tr, tg, tb);
 
 
                         dwgfx.Print( 170, 65, "PAR TIME    1:15", tr, tg, tb);
@@ -851,8 +851,8 @@ void titlerender(Graphics& dwgfx, mapclass& map, Game& game, entityclass& obj, U
                         dwgfx.Print( 16, 75, "BEST SHINY ", tr, tg, tb);
                         dwgfx.Print( 16, 85, "BEST LIVES ", tr, tg, tb);
                         dwgfx.Print( 110, 65, game.timetstring(game.besttimes[1], help), tr, tg, tb);
-                        dwgfx.Print( 110, 75, help.String(game.besttrinkets[1])+"/4", tr, tg, tb);
-                        dwgfx.Print( 110, 85, help.String(game.bestlives[1]), tr, tg, tb);
+                        dwgfx.Print( 110, 75, UtilityClass::String(game.besttrinkets[1])+"/4", tr, tg, tb);
+                        dwgfx.Print( 110, 85, UtilityClass::String(game.bestlives[1]), tr, tg, tb);
 
 
                         dwgfx.Print( 170, 65, "PAR TIME    2:45", tr, tg, tb);
@@ -898,8 +898,8 @@ void titlerender(Graphics& dwgfx, mapclass& map, Game& game, entityclass& obj, U
                         dwgfx.Print( 16, 75, "BEST SHINY ", tr, tg, tb);
                         dwgfx.Print( 16, 85, "BEST LIVES ", tr, tg, tb);
                         dwgfx.Print( 110, 65, game.timetstring(game.besttimes[2], help), tr, tg, tb);
-                        dwgfx.Print( 110, 75, help.String(game.besttrinkets[2])+"/2", tr, tg, tb);
-                        dwgfx.Print( 110, 85, help.String(game.bestlives[2]), tr, tg, tb);
+                        dwgfx.Print( 110, 75, UtilityClass::String(game.besttrinkets[2])+"/2", tr, tg, tb);
+                        dwgfx.Print( 110, 85, UtilityClass::String(game.bestlives[2]), tr, tg, tb);
 
 
                         dwgfx.Print( 170, 65, "PAR TIME    1:45", tr, tg, tb);
@@ -945,8 +945,8 @@ void titlerender(Graphics& dwgfx, mapclass& map, Game& game, entityclass& obj, U
                         dwgfx.Print( 16, 75, "BEST SHINY ", tr, tg, tb);
                         dwgfx.Print( 16, 85, "BEST LIVES ", tr, tg, tb);
                         dwgfx.Print( 110, 65, game.timetstring(game.besttimes[3], help), tr, tg, tb);
-                        dwgfx.Print( 110, 75, help.String(game.besttrinkets[3])+"/5", tr, tg, tb);
-                        dwgfx.Print( 110, 85, help.String(game.bestlives[3]), tr, tg, tb);
+                        dwgfx.Print( 110, 75, UtilityClass::String(game.besttrinkets[3])+"/5", tr, tg, tb);
+                        dwgfx.Print( 110, 85, UtilityClass::String(game.bestlives[3]), tr, tg, tb);
 
 
                         dwgfx.Print( 170, 65, "PAR TIME    3:20", tr, tg, tb);
@@ -992,8 +992,8 @@ void titlerender(Graphics& dwgfx, mapclass& map, Game& game, entityclass& obj, U
                         dwgfx.Print( 16, 75, "BEST SHINY ", tr, tg, tb);
                         dwgfx.Print( 16, 85, "BEST LIVES ", tr, tg, tb);
                         dwgfx.Print( 110, 65, game.timetstring(game.besttimes[4], help), tr, tg, tb);
-                        dwgfx.Print( 110, 75, help.String(game.besttrinkets[4])+"/1", tr, tg, tb);
-                        dwgfx.Print( 110, 85, help.String(game.bestlives[4]), tr, tg, tb);
+                        dwgfx.Print( 110, 75, UtilityClass::String(game.besttrinkets[4])+"/1", tr, tg, tb);
+                        dwgfx.Print( 110, 85, UtilityClass::String(game.bestlives[4]), tr, tg, tb);
 
 
                         dwgfx.Print( 170, 65, "PAR TIME    2:00", tr, tg, tb);
@@ -1039,8 +1039,8 @@ void titlerender(Graphics& dwgfx, mapclass& map, Game& game, entityclass& obj, U
                         dwgfx.Print( 16, 75, "BEST SHINY ", tr, tg, tb);
                         dwgfx.Print( 16, 85, "BEST LIVES ", tr, tg, tb);
                         dwgfx.Print( 110, 65, game.timetstring(game.besttimes[5], help), tr, tg, tb);
-                        dwgfx.Print( 110, 75, help.String(game.besttrinkets[5])+"/1", tr, tg, tb);
-                        dwgfx.Print( 110, 85, help.String(game.bestlives[5]), tr, tg, tb);
+                        dwgfx.Print( 110, 75, UtilityClass::String(game.besttrinkets[5])+"/1", tr, tg, tb);
+                        dwgfx.Print( 110, 85, UtilityClass::String(game.bestlives[5]), tr, tg, tb);
 
 
                         dwgfx.Print( 170, 65, "PAR TIME    2:15", tr, tg, tb);
@@ -1766,19 +1766,19 @@ void gamerender(Graphics& dwgfx, mapclass& map, Game& game, entityclass& obj, Ut
             }
             if(game.deathcounts>0)
             {
-                dwgfx.bprint(56, 30,help.String(game.deathcounts),  196, 80, 80);
+                dwgfx.bprint(56, 30,UtilityClass::String(game.deathcounts),  196, 80, 80);
             }
             else
             {
-                dwgfx.bprint(56, 30,help.String(game.deathcounts),  196, 196, 196);
+                dwgfx.bprint(56, 30,UtilityClass::String(game.deathcounts),  196, 196, 196);
             }
             if(game.trinkets<game.timetrialshinytarget)
             {
-                dwgfx.bprint(56, 42,help.String(game.trinkets) + " of " +help.String(game.timetrialshinytarget),  196, 80, 80);
+                dwgfx.bprint(56, 42,UtilityClass::String(game.trinkets) + " of " +UtilityClass::String(game.timetrialshinytarget),  196, 80, 80);
             }
             else
             {
-                dwgfx.bprint(56, 42,help.String(game.trinkets) + " of " +help.String(game.timetrialshinytarget),  196, 196, 196);
+                dwgfx.bprint(56, 42,UtilityClass::String(game.trinkets) + " of " +UtilityClass::String(game.timetrialshinytarget),  196, 196, 196);
             }
 
             if(game.timetrialparlost)
@@ -1825,7 +1825,7 @@ void gamerender(Graphics& dwgfx, mapclass& map, Game& game, entityclass& obj, Ut
         obj.trophytext--;
     }
 
-    //dwgfx.rprint(5, 231,help.String(game.coins), 255 - help.glow/2, 255 - help.glow/2, 196, true);
+    //dwgfx.rprint(5, 231,UtilityClass::String(game.coins), 255 - help.glow/2, 255 - help.glow/2, 196, true);
     //dwgfx.drawhuetile(311, 230, 48, 1);
 
     //Level complete image
@@ -1837,14 +1837,14 @@ void gamerender(Graphics& dwgfx, mapclass& map, Game& game, entityclass& obj, Ut
 
     /*
     game.test = true;
-    if (game.teststring !=help.String(game.state)) trace(game.state);
-    game.teststring =help.String(game.state);
+    if (game.teststring !=UtilityClass::String(game.state)) trace(game.state);
+    game.teststring =UtilityClass::String(game.state);
     */
 
     //Detail entity info for debuging
     /*
     for (int i = 0; i < obj.nentity; i++) {
-    	game.tempstring =help.String(obj.entities[i].type) +", (" +help.String(obj.entities[i].xp) + "," +help.String(obj.entities[i].yp) + ")";
+    	game.tempstring =UtilityClass::String(obj.entities[i].type) +", (" +UtilityClass::String(obj.entities[i].xp) + "," +UtilityClass::String(obj.entities[i].yp) + ")";
     	game.tempstring += " state:" +obj.entities[i].state + ", delay:" + obj.entities[i].statedelay;
     	dwgfx.Print(5, 5 + i * 8, game.tempstring, 255, 255, 255);
     }
@@ -1852,12 +1852,12 @@ void gamerender(Graphics& dwgfx, mapclass& map, Game& game, entityclass& obj, Ut
 
     /*
     game.test = true;
-    game.teststring =help.String(int(obj.entities[obj.getplayer()].xp)) + "," +help.String(int(obj.entities[obj.getplayer()].yp));
-    game.teststring += "   [" +help.String(game.roomx) + "," +help.String(game.roomy) + "]";
+    game.teststring =UtilityClass::String(int(obj.entities[obj.getplayer()].xp)) + "," +UtilityClass::String(int(obj.entities[obj.getplayer()].yp));
+    game.teststring += "   [" +UtilityClass::String(game.roomx) + "," +UtilityClass::String(game.roomy) + "]";
     */
 
     //game.test = true;
-    //game.teststring = "Current room deaths: " +help.String(game.currentroomdeaths);
+    //game.teststring = "Current room deaths: " +UtilityClass::String(game.currentroomdeaths);
 
     //Special thing for loading:
     /*
@@ -2409,7 +2409,7 @@ void maprender(Graphics& dwgfx, Game& game, mapclass& map, entityclass& obj, Uti
               dwgfx.Print(0, 152, help.number(game.trinkets) + " out of " + help.number(map.customtrinkets), 96,96,96, true);
 
               dwgfx.Print(0, 114, "[Number of Deaths]", 196, 196, 255 - help.glow, true);
-              dwgfx.Print(0, 102,help.String(game.deathcounts),  96,96,96, true);
+              dwgfx.Print(0, 102,UtilityClass::String(game.deathcounts),  96,96,96, true);
 
               dwgfx.Print(0, 64, "[Time Taken]", 196, 196, 255 - help.glow, true);
               dwgfx.Print(0, 52, game.timestring(help),  96, 96, 96, true);
@@ -2420,7 +2420,7 @@ void maprender(Graphics& dwgfx, Game& game, mapclass& map, entityclass& obj, Uti
               dwgfx.Print(0, 64, help.number(game.trinkets) + " out of "+help.number(map.customtrinkets), 96,96,96, true);
 
               dwgfx.Print(0, 102, "[Number of Deaths]", 196, 196, 255 - help.glow, true);
-              dwgfx.Print(0, 114,help.String(game.deathcounts),  96,96,96, true);
+              dwgfx.Print(0, 114,UtilityClass::String(game.deathcounts),  96,96,96, true);
 
               dwgfx.Print(0, 152, "[Time Taken]", 196, 196, 255 - help.glow, true);
               dwgfx.Print(0, 164, game.timestring(help),  96, 96, 96, true);
@@ -2432,7 +2432,7 @@ void maprender(Graphics& dwgfx, Game& game, mapclass& map, entityclass& obj, Uti
               dwgfx.Print(0, 152, help.number(game.trinkets) + " out of Twenty", 96,96,96, true);
 
               dwgfx.Print(0, 114, "[Number of Deaths]", 196, 196, 255 - help.glow, true);
-              dwgfx.Print(0, 102,help.String(game.deathcounts),  96,96,96, true);
+              dwgfx.Print(0, 102,UtilityClass::String(game.deathcounts),  96,96,96, true);
 
               dwgfx.Print(0, 64, "[Time Taken]", 196, 196, 255 - help.glow, true);
               dwgfx.Print(0, 52, game.timestring(help),  96, 96, 96, true);
@@ -2443,7 +2443,7 @@ void maprender(Graphics& dwgfx, Game& game, mapclass& map, entityclass& obj, Uti
               dwgfx.Print(0, 64, help.number(game.trinkets) + " out of Twenty", 96,96,96, true);
 
               dwgfx.Print(0, 102, "[Number of Deaths]", 196, 196, 255 - help.glow, true);
-              dwgfx.Print(0, 114,help.String(game.deathcounts),  96,96,96, true);
+              dwgfx.Print(0, 114,UtilityClass::String(game.deathcounts),  96,96,96, true);
 
               dwgfx.Print(0, 152, "[Time Taken]", 196, 196, 255 - help.glow, true);
               dwgfx.Print(0, 164, game.timestring(help),  96, 96, 96, true);
@@ -2822,7 +2822,7 @@ void towerrender(Graphics& dwgfx, Game& game, mapclass& map, entityclass& obj, U
     FillRect(dwgfx.backBuffer, dwgfx.footerrect, 0x000000);
     dwgfx.Print(5, 231, map.roomname, 196, 196, 255 - help.glow, true);
 
-    //dwgfx.rprint(5, 231,help.String(game.coins), 255 - help.glow/2, 255 - help.glow/2, 196, true);
+    //dwgfx.rprint(5, 231,UtilityClass::String(game.coins), 255 - help.glow/2, 255 - help.glow/2, 196, true);
     //dwgfx.drawhuetile(311, 230, 48, 1);
 
     if (game.intimetrial && dwgfx.fademode==0)
@@ -2865,19 +2865,19 @@ void towerrender(Graphics& dwgfx, Game& game, mapclass& map, entityclass& obj, U
             }
             if(game.deathcounts>0)
             {
-                dwgfx.bprint(56, 30,help.String(game.deathcounts),  196, 80, 80);
+                dwgfx.bprint(56, 30,UtilityClass::String(game.deathcounts),  196, 80, 80);
             }
             else
             {
-                dwgfx.bprint(56, 30,help.String(game.deathcounts),  196, 196, 196);
+                dwgfx.bprint(56, 30,UtilityClass::String(game.deathcounts),  196, 196, 196);
             }
             if(game.trinkets<game.timetrialshinytarget)
             {
-                dwgfx.bprint(56, 42,help.String(game.trinkets) + " of " +help.String(game.timetrialshinytarget),  196, 80, 80);
+                dwgfx.bprint(56, 42,UtilityClass::String(game.trinkets) + " of " +UtilityClass::String(game.timetrialshinytarget),  196, 80, 80);
             }
             else
             {
-                dwgfx.bprint(56, 42,help.String(game.trinkets) + " of " +help.String(game.timetrialshinytarget),  196, 196, 196);
+                dwgfx.bprint(56, 42,UtilityClass::String(game.trinkets) + " of " +UtilityClass::String(game.timetrialshinytarget),  196, 196, 196);
             }
 
             if(game.timetrialparlost)

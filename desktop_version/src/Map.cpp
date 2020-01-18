@@ -1157,7 +1157,7 @@ void mapclass::loadlevel(int rx, int ry, Graphics& dwgfx, Game& game, entityclas
 {
 	int t;
 	//t = rx + (ry * 100);
-	//roomname = "[UNTITLED] (" + String(rx)+","+String(ry)+")";
+	//roomname = "[UNTITLED] (" + UtilityClass::String(rx)+","+UtilityClass::String(ry)+")";
 	if (!finalmode)
 	{
 		explored[rx - 100 + ((ry - 100) * 20)] = 1;

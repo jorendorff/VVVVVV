@@ -78,9 +78,9 @@ void preloaderrender(Graphics& dwgfx, Game& game, UtilityClass& help)
     FillRect(dwgfx.backBuffer, pre_frontrectx, pre_frontrecty, pre_frontrectw,pre_frontrecth, dwgfx.getBGR(0x3E,0x31,0xA2));
 
     if(pre_fakepercent==100){
-      dwgfx.Print(282-(15*8), 204, "LOADING... " + help.String(int(pre_fakepercent))+"%", 124, 112, 218, false);
+      dwgfx.Print(282-(15*8), 204, "LOADING... " + UtilityClass::String(int(pre_fakepercent))+"%", 124, 112, 218, false);
     }else{
-      dwgfx.Print(282-(14*8), 204, "LOADING... " + help.String(int(pre_fakepercent))+"%", 124, 112, 218, false);
+      dwgfx.Print(282-(14*8), 204, "LOADING... " + UtilityClass::String(int(pre_fakepercent))+"%", 124, 112, 218, false);
     }
 
     //Render

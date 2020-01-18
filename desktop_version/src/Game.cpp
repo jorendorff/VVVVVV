@@ -3005,12 +3005,12 @@ void Game::updatestate( Graphics& dwgfx, mapclass& map, entityclass& obj, Utilit
             if (dwgfx.flipmode)
             {
                 dwgfx.createtextbox(" Total Flips:", 64, 116-24, 0,0,0);
-                dwgfx.createtextbox(help.String(totalflips), 180, 116-24, 0, 0, 0);
+                dwgfx.createtextbox(UtilityClass::String(totalflips), 180, 116-24, 0, 0, 0);
             }
             else
             {
                 dwgfx.createtextbox(" Total Flips:", 64, 123, 0,0,0);
-                dwgfx.createtextbox(help.String(totalflips), 180, 123, 0, 0, 0);
+                dwgfx.createtextbox(UtilityClass::String(totalflips), 180, 123, 0, 0, 0);
             }
             break;
         case 3506:
@@ -3020,12 +3020,12 @@ void Game::updatestate( Graphics& dwgfx, mapclass& map, entityclass& obj, Utilit
             if (dwgfx.flipmode)
             {
                 dwgfx.createtextbox("Total Deaths:", 64, 104-24, 0,0,0);
-                dwgfx.createtextbox(help.String(deathcounts), 180, 104-24, 0, 0, 0);
+                dwgfx.createtextbox(UtilityClass::String(deathcounts), 180, 104-24, 0, 0, 0);
             }
             else
             {
                 dwgfx.createtextbox("Total Deaths:", 64, 135, 0,0,0);
-                dwgfx.createtextbox(help.String(deathcounts), 180, 135, 0, 0, 0);
+                dwgfx.createtextbox(UtilityClass::String(deathcounts), 180, 135, 0, 0, 0);
             }
             break;
         case 3507:
@@ -3034,13 +3034,13 @@ void Game::updatestate( Graphics& dwgfx, mapclass& map, entityclass& obj, Utilit
 
             if (dwgfx.flipmode)
             {
-                tempstring = "Hardest Room (with " + help.String(hardestroomdeaths) + " deaths)";
+                tempstring = "Hardest Room (with " + UtilityClass::String(hardestroomdeaths) + " deaths)";
                 dwgfx.createtextbox(tempstring, -1, 81-24, 0,0,0);
                 dwgfx.createtextbox(hardestroom, -1, 69-24, 0, 0, 0);
             }
             else
             {
-                tempstring = "Hardest Room (with " + help.String(hardestroomdeaths) + " deaths)";
+                tempstring = "Hardest Room (with " + UtilityClass::String(hardestroomdeaths) + " deaths)";
                 dwgfx.createtextbox(tempstring, -1, 158, 0,0,0);
                 dwgfx.createtextbox(hardestroom, -1, 170, 0, 0, 0);
             }
@@ -5983,7 +5983,7 @@ std::string Game::giventimestring( int hrs, int min, int sec, UtilityClass& help
     tempstring = "";
     if (hrs > 0)
     {
-        tempstring += help.String(hrs) + ":";
+        tempstring += UtilityClass::String(hrs) + ":";
     }
     tempstring += help.twodigits(min) + ":" + help.twodigits(sec);
     return tempstring;
@@ -5994,7 +5994,7 @@ std::string Game::timestring( UtilityClass& help )
     tempstring = "";
     if (hours > 0)
     {
-        tempstring += help.String(hours) + ":";
+        tempstring += UtilityClass::String(hours) + ":";
     }
     tempstring += help.twodigits(minutes) + ":" + help.twodigits(seconds);
     return tempstring;

@@ -1841,7 +1841,7 @@ void gameinput(KeyPoll& key, Graphics& dwgfx, Game& game, mapclass& map,
     }
     */
     /*game.test = true;
-    game.teststring = String(game.inertia);
+    game.teststring = UtilityClass::String(game.inertia);
     if (key.isDown("1".charCodeAt(0))) game.inertia = 0.5;
     if (key.isDown("2".charCodeAt(0))) game.inertia = 0.6;
     if (key.isDown("3".charCodeAt(0))) game.inertia = 0.7;
@@ -1895,8 +1895,8 @@ void gameinput(KeyPoll& key, Graphics& dwgfx, Game& game, mapclass& map,
         if (obj.entities[ie].rule == 0)
         {
             //game.test = true;
-            //game.teststring = "player(" + String(int(obj.entities[i])) + "," + String(int(obj.entities[i].yp)) + ")"
-            //  + ", mouse(" + String(int(game.mx)) + "," + String(int(game.my)) + ")";
+            //game.teststring = "player(" + UtilityClass::String(int(obj.entities[i])) + "," + UtilityClass::String(int(obj.entities[i].yp)) + ")"
+            //  + ", mouse(" + UtilityClass::String(int(game.mx)) + "," + UtilityClass::String(int(game.my)) + ")";
             if (game.hascontrol && game.deathseq == -1 && game.lifeseq <= 5)
             {
                 /*
