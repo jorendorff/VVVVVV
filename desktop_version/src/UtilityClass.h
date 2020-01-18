@@ -22,7 +22,7 @@ public:
 
     static std::string GCString(std::vector<SDL_GameControllerButton> buttons);
 
-    std::string twodigits(int t);
+    static std::string twodigits(int t);
 
     std::string timestring(int t);
 

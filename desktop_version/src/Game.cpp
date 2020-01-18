@@ -5985,7 +5985,7 @@ std::string Game::giventimestring( int hrs, int min, int sec, UtilityClass& help
     {
         tempstring += UtilityClass::String(hrs) + ":";
     }
-    tempstring += help.twodigits(min) + ":" + help.twodigits(sec);
+    tempstring += UtilityClass::twodigits(min) + ":" + UtilityClass::twodigits(sec);
     return tempstring;
 }
 
@@ -5996,7 +5996,7 @@ std::string Game::timestring( UtilityClass& help )
     {
         tempstring += UtilityClass::String(hours) + ":";
     }
-    tempstring += help.twodigits(minutes) + ":" + help.twodigits(seconds);
+    tempstring += UtilityClass::twodigits(minutes) + ":" + UtilityClass::twodigits(seconds);
     return tempstring;
 }
 
@@ -6006,11 +6006,11 @@ std::string Game::partimestring( UtilityClass& help )
     tempstring = "";
     if (timetrialpar >= 60)
     {
-        tempstring = help.twodigits(int((timetrialpar - (timetrialpar % 60)) / 60)) + ":" + help.twodigits(timetrialpar % 60);
+        tempstring = UtilityClass::twodigits(int((timetrialpar - (timetrialpar % 60)) / 60)) + ":" + UtilityClass::twodigits(timetrialpar % 60);
     }
     else
     {
-        tempstring = "00:" + help.twodigits(timetrialpar);
+        tempstring = "00:" + UtilityClass::twodigits(timetrialpar);
     }
     return tempstring;
 }
@@ -6021,12 +6021,12 @@ std::string Game::resulttimestring( UtilityClass& help )
     tempstring = "";
     if (timetrialresulttime > 60)
     {
-        tempstring = help.twodigits(int((timetrialresulttime - (timetrialresulttime % 60)) / 60)) + ":"
-                     + help.twodigits(timetrialresulttime % 60);
+        tempstring = UtilityClass::twodigits(int((timetrialresulttime - (timetrialresulttime % 60)) / 60)) + ":"
+                     + UtilityClass::twodigits(timetrialresulttime % 60);
     }
     else
     {
-        tempstring = "00:" + help.twodigits(timetrialresulttime);
+        tempstring = "00:" + UtilityClass::twodigits(timetrialresulttime);
     }
     return tempstring;
 }
@@ -6037,11 +6037,11 @@ std::string Game::timetstring( int t, UtilityClass& help )
     tempstring = "";
     if (t >= 60)
     {
-        tempstring = help.twodigits(int((t - (t % 60)) / 60)) + ":" + help.twodigits(t % 60);
+        tempstring = UtilityClass::twodigits(int((t - (t % 60)) / 60)) + ":" + UtilityClass::twodigits(t % 60);
     }
     else
     {
-        tempstring = "00:" + help.twodigits(t);
+        tempstring = "00:" + UtilityClass::twodigits(t);
     }
     return tempstring;
 }
