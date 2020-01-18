@@ -1,5 +1,5 @@
 HEADERS=\
-	$(cd src; ls *.h) \
+	$(ls src/*.h) \
 	$(RUST_HEADER)
 
 C_OBJECT_FILES=\
